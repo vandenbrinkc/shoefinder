@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#002868">
+    <title>ShoeFinder — Find your perfect size in any brand</title>
+    <meta name="description" content="Find your shoe size in any brand based on your foot length. Fast, accurate, free.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary:        #002868;
+            --primary-dark:   #001a4d;
+            --primary-darker: #001233;
+            --primary-light:  #e6ecf5;
+            --primary-lighter:#f3f6fb;
+            --primary-border: #b8c5dc;
+            --accent:         #BF0A30;
+            --accent-dark:    #9a0826;
+            --accent-light:   #fce6ea;
+            --text:           #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --text-muted:     #8c8c8c;
+            --bg-top:    #ffffff;
+            --bg-bottom: #f5efe6;
+            --card: #ffffff;
+            --border: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 40, 104, 0.08);
+            --shadow-primary: 0 4px 14px rgba(191, 10, 48, 0.22);
+            --radius: 12px;
+            --gradient-header: linear-gradient(135deg, #002868 0%, #BF0A30 100%);
+            --gradient-btn:    linear-gradient(135deg, #BF0A30 0%, #9a0826 100%);
+            --gradient-result: linear-gradient(135deg, #ffffff 0%, #f3f6fb 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.5;
+            font-size: 15px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+        }
+        .header {
+            background: var(--gradient-header);
+            color: white;
+            padding: 14px 20px;
+            text-align: center;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 668px;
+            margin: 12px auto 0;
+            margin-left: 16px;
+            margin-right: 16px;
+        }
+        @media (min-width: 700px) {
+            .header { margin-left: auto; margin-right: auto; }
+        }
+        .header h1 { font-size: 1.3em; font-weight: 800; letter-spacing: -0.5px; }
+        .header p { display: none; }
+        .main { max-width: 700px; margin: 0 auto; padding: 12px 16px 24px; }
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+        }
+        .card-title {
+            font-size: 0.95em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+        }
+        .form-group { margin-bottom: 12px; }
+        .form-group:last-of-type { margin-bottom: 16px; }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.88em;
+            color: var(--text-secondary);
+        }
+        .form-select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            background: white;
+            color: var(--text);
+            transition: border-color 0.15s;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23002868' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+        .form-select:focus { outline: none; border-color: var(--primary); }
+        .form-select:disabled {
+            background-color: #f5f5f5;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+        .form-hint {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .gender-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .gender-option { position: relative; }
+        .gender-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .gender-label {
+            display: block;
+            padding: 10px 4px;
+            text-align: center;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-weight: 600;
+            font-size: 0.85em;
+            user-select: none;
+        }
+        .gender-option input:checked + .gender-label {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .gender-option input:disabled + .gender-label {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .unit-toggle {
+            display: inline-flex;
+            background: #eef1f5;
+            border-radius: 8px;
+            padding: 3px;
+        }
+        .unit-toggle button {
+            background: transparent;
+            border: none;
+            padding: 5px 14px;
+            font-size: 0.82em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .unit-toggle button.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0,40,104,0.15);
+        }
+        .length-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--gradient-btn);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.05s;
+            font-family: inherit;
+            box-shadow: var(--shadow-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn:hover { opacity: 0.92; }
+        .btn:active { transform: scale(0.99); }
+        .shop-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .btn-shop {
+            display: block;
+            padding: 12px 8px;
+            background: var(--gradient-btn);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            box-shadow: var(--shadow-primary);
+            transition: opacity 0.15s, transform 0.05s;
+            white-space: nowrap;
+        }
+        .btn-shop:hover { opacity: 0.92; }
+        .btn-shop:active { transform: scale(0.99); }
+        .btn-shop .arrow {
+            display: inline-block;
+            margin-left: 3px;
+            transition: transform 0.15s;
+        }
+        .btn-shop:hover .arrow { transform: translateX(3px); }
+        @media (min-width: 600px) {
+            .shop-row { gap: 12px; }
+            .btn-shop { padding: 14px 10px; font-size: 0.95em; letter-spacing: 0.5px; }
+        }
+        .result-card {
+            background: var(--gradient-result);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 18px;
+            text-align: center;
+            margin-bottom: 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .result-brand {
+            font-size: 0.78em;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 2px;
+        }
+        .result-foot {
+            font-size: 0.78em;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .result-size {
+            font-size: 3.8em;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+            margin: 6px 0 2px;
+            letter-spacing: -2px;
+        }
+        .result-size-label {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .result-detail {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding-top: 12px;
+            border-top: 1px solid var(--primary-border);
+        }
+        .result-item { text-align: center; }
+        .result-item-label {
+            font-size: 0.65em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .result-item-value {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--text);
+            margin-top: 2px;
+        }
+        .result-notes {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--primary-border);
+            color: var(--primary);
+            font-size: 0.82em;
+            font-style: italic;
+        }
+        .fallback-banner {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: var(--primary-lighter);
+            border-radius: 8px;
+            font-size: 0.78em;
+            color: var(--primary);
+            line-height: 1.45;
+            text-align: left;
+        }
+        .empty-state {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            color: var(--text-muted);
+        }
+        .empty-icon { font-size: 2em; margin-bottom: 6px; }
+        .empty-title {
+            font-weight: 600;
+            font-size: 0.95em;
+            margin-bottom: 3px;
+            color: var(--text);
+        }
+        .empty-text { font-size: 0.85em; }
+        .tips {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            box-shadow: var(--shadow);
+        }
+        .tips-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 0.88em;
+            color: var(--primary);
+        }
+        .tips-list { list-style: none; font-size: 0.82em; color: var(--text-secondary); }
+        .tips-list li {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .tips-list li:last-child { border-bottom: none; }
+        .footer {
+            text-align: center;
+            padding: 20px 16px;
+            color: var(--text-muted);
+            font-size: 0.78em;
+        }
+        @media (max-height: 720px) { .tips { display: none; } }
+        @media (min-width: 600px) {
+            .header { padding: 28px 20px; margin-top: 20px; }
+            .header h1 { font-size: 1.9em; }
+            .header p {
+                display: block;
+                font-size: 0.95em;
+                opacity: 0.95;
+                margin-top: 6px;
+                font-weight: 400;
+            }
+            .main { padding: 20px; }
+            .card { padding: 24px; margin-bottom: 16px; }
+            .card-title { font-size: 1.05em; }
+            .result-card { padding: 28px; }
+            .result-size { font-size: 5em; }
+            .result-detail { gap: 12px; }
+            .gender-label { padding: 14px; font-size: 0.95em; }
+            .form-select { padding: 13px 14px; }
+            .btn { padding: 15px; font-size: 1.05em; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>👟 ShoeFinder</h1>
+        <p>Find your perfect size in any brand</p>
+    </header>
+
+    <main class="main">
+        <div id="result-area"></div>
+
+        <div class="card">
+            <div class="card-title">📏 Enter your details</div>
+
+            <div class="form-group">
+                <label class="form-label" for="brand">Brand</label>
+                <select id="brand" class="form-select">
+                    <option value="" disabled selected>Select a brand...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Gender</label>
+                <div class="gender-group">
+                    <div class="gender-option">
+                        <input type="radio" name="gender" id="men" value="men">
+                        <label for="men" class="gender-label">Men</label>
+                    </div>
+                    <div class="gender-option">
+                        <input type="radio" name="gender" id="women" value="women">
+                        <label for="women" class="gender-label">Women</label>
+                    </div>
+                    <div class="gender-option">
+                        <input type="radio" name="gender" id="unisex" value="unisex">
+                        <label for="unisex" class="gender-label">Unisex</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="length-row">
+                    <label class="form-label" for="length-select" style="margin-bottom: 0;">Foot Length</label>
+                    <div class="unit-toggle" role="tablist" aria-label="Unit toggle">
+                        <button type="button" id="unit-in" class="active" aria-pressed="true">in</button>
+                        <button type="button" id="unit-cm" aria-pressed="false">cm</button>
+                    </div>
+                </div>
+                <select id="length-select" class="form-select" disabled>
+                    <option value="" disabled selected>Choose a brand + gender first...</option>
+                </select>
+                <div class="form-hint">Measure from heel to longest toe</div>
+            </div>
+
+            <button type="button" id="find-btn" class="btn">Find my size</button>
+        </div>
+
+        <div class="tips">
+            <div class="tips-title">💡 Tips for accurate measurement</div>
+            <ul class="tips-list">
+                <li>Measure at the end of the day — feet are largest then</li>
+                <li>Stand on a sheet of paper and trace around your foot</li>
+                <li>Measure both feet and use the longer one</li>
+                <li>Add 0.2"–0.4" (0.5–1 cm) for movement room</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer class="footer">
+        ShoeFinder · based on official manufacturer charts
+    </footer>
+
+    <script>
+        // ===== EMBEDDED DATA =====
+        const DATA = {"Adidas":{"men":{"notes":"Adidas uses fractional EU sizes (36 2/3, 37 1/3, etc.) - unique to this brand. Generally runs true-to-size.","rows":[{"cm":22.1,"in":8.7,"us":"4","uk":"3.5","eu":"36"},{"cm":22.5,"in":8.9,"us":"4.5","uk":"4","eu":"36 2/3"},{"cm":22.9,"in":9.0,"us":"5","uk":"4.5","eu":"37 1/3"},{"cm":23.3,"in":9.2,"us":"5.5","uk":"5","eu":"38"},{"cm":23.8,"in":9.4,"us":"6","uk":"5.5","eu":"38 2/3"},{"cm":24.2,"in":9.5,"us":"6.5","uk":"6","eu":"39 1/3"},{"cm":24.6,"in":9.7,"us":"7","uk":"6.5","eu":"40"},{"cm":25.0,"in":9.8,"us":"7.5","uk":"7","eu":"40 2/3"},{"cm":25.5,"in":10.0,"us":"8","uk":"7.5","eu":"41 1/3"},{"cm":25.9,"in":10.2,"us":"8.5","uk":"8","eu":"42"},{"cm":26.3,"in":10.4,"us":"9","uk":"8.5","eu":"42 2/3"},{"cm":26.7,"in":10.5,"us":"9.5","uk":"9","eu":"43 1/3"},{"cm":27.1,"in":10.7,"us":"10","uk":"9.5","eu":"44"},{"cm":27.6,"in":10.9,"us":"10.5","uk":"10","eu":"44 2/3"},{"cm":28.0,"in":11.0,"us":"11","uk":"10.5","eu":"45 1/3"},{"cm":28.4,"in":11.2,"us":"11.5","uk":"11","eu":"46"},{"cm":28.8,"in":11.3,"us":"12","uk":"11.5","eu":"46 2/3"},{"cm":29.3,"in":11.5,"us":"12.5","uk":"12","eu":"47 1/3"},{"cm":29.7,"in":11.7,"us":"13","uk":"12.5","eu":"48"},{"cm":30.1,"in":11.9,"us":"13.5","uk":"13","eu":"48 2/3"},{"cm":30.5,"in":12.0,"us":"14","uk":"13.5","eu":"49 1/3"},{"cm":31.0,"in":12.2,"us":"14.5","uk":"14","eu":"50"},{"cm":31.4,"in":12.4,"us":"15","uk":"14.5","eu":"50 2/3"},{"cm":31.8,"in":12.7,"us":"16","uk":"15","eu":"51 1/3"},{"cm":32.6,"in":13.0,"us":"17","uk":"16","eu":"52 2/3"},{"cm":33.5,"in":13.3,"us":"18","uk":"17","eu":"53 1/3"},{"cm":34.3,"in":13.7,"us":"19","uk":"18","eu":"54 2/3"},{"cm":35.2,"in":14.0,"us":"20","uk":"19","eu":"55 2/3"}]},"unisex":{"notes":"Adidas uses fractional EU sizes (36 2/3, 37 1/3, etc.) - unique to this brand. Generally runs true-to-size.","rows":[{"cm":22.1,"in":8.7,"us":"4","uk":"3.5","eu":"36"},{"cm":22.5,"in":8.9,"us":"4.5","uk":"4","eu":"36 2/3"},{"cm":22.9,"in":9.0,"us":"5","uk":"4.5","eu":"37 1/3"},{"cm":23.3,"in":9.2,"us":"5.5","uk":"5","eu":"38"},{"cm":23.8,"in":9.4,"us":"6","uk":"5.5","eu":"38 2/3"},{"cm":24.2,"in":9.5,"us":"6.5","uk":"6","eu":"39 1/3"},{"cm":24.6,"in":9.7,"us":"7","uk":"6.5","eu":"40"},{"cm":25.0,"in":9.8,"us":"7.5","uk":"7","eu":"40 2/3"},{"cm":25.5,"in":10.0,"us":"8","uk":"7.5","eu":"41 1/3"},{"cm":25.9,"in":10.2,"us":"8.5","uk":"8","eu":"42"},{"cm":26.3,"in":10.4,"us":"9","uk":"8.5","eu":"42 2/3"},{"cm":26.7,"in":10.5,"us":"9.5","uk":"9","eu":"43 1/3"},{"cm":27.1,"in":10.7,"us":"10","uk":"9.5","eu":"44"},{"cm":27.6,"in":10.9,"us":"10.5","uk":"10","eu":"44 2/3"},{"cm":28.0,"in":11.0,"us":"11","uk":"10.5","eu":"45 1/3"},{"cm":28.4,"in":11.2,"us":"11.5","uk":"11","eu":"46"},{"cm":28.8,"in":11.3,"us":"12","uk":"11.5","eu":"46 2/3"},{"cm":29.3,"in":11.5,"us":"12.5","uk":"12","eu":"47 1/3"},{"cm":29.7,"in":11.7,"us":"13","uk":"12.5","eu":"48"},{"cm":30.1,"in":11.9,"us":"13.5","uk":"13","eu":"48 2/3"},{"cm":30.5,"in":12.0,"us":"14","uk":"13.5","eu":"49 1/3"},{"cm":31.0,"in":12.2,"us":"14.5","uk":"14","eu":"50"},{"cm":31.4,"in":12.4,"us":"15","uk":"14.5","eu":"50 2/3"},{"cm":31.8,"in":12.7,"us":"16","uk":"15","eu":"51 1/3"},{"cm":32.6,"in":13.0,"us":"17","uk":"16","eu":"52 2/3"},{"cm":33.5,"in":13.3,"us":"18","uk":"17","eu":"53 1/3"},{"cm":34.3,"in":13.7,"us":"19","uk":"18","eu":"54 2/3"},{"cm":35.2,"in":14.0,"us":"20","uk":"19","eu":"55 2/3"}]},"women":{"notes":"Adidas uses fractional EU sizes (36 2/3, 37 1/3, etc.) - unique to this brand. Generally runs true-to-size.","rows":[{"cm":22.1,"in":8.7,"us":"5","uk":"3.5","eu":"36"},{"cm":22.5,"in":8.9,"us":"5.5","uk":"4","eu":"36 2/3"},{"cm":22.9,"in":9.0,"us":"6","uk":"4.5","eu":"37 1/3"},{"cm":23.3,"in":9.2,"us":"6.5","uk":"5","eu":"38"},{"cm":23.8,"in":9.4,"us":"7","uk":"5.5","eu":"38 2/3"},{"cm":24.2,"in":9.5,"us":"7.5","uk":"6","eu":"39 1/3"},{"cm":24.6,"in":9.7,"us":"8","uk":"6.5","eu":"40"},{"cm":25.0,"in":9.8,"us":"8.5","uk":"7","eu":"40 2/3"},{"cm":25.5,"in":10.0,"us":"9","uk":"7.5","eu":"41 1/3"},{"cm":25.9,"in":10.2,"us":"9.5","uk":"8","eu":"42"},{"cm":26.3,"in":10.4,"us":"10","uk":"8.5","eu":"42 2/3"},{"cm":26.7,"in":10.5,"us":"10.5","uk":"9","eu":"43 1/3"},{"cm":27.1,"in":10.7,"us":"11","uk":"9.5","eu":"44"},{"cm":27.6,"in":10.9,"us":"11.5","uk":"10","eu":"44 2/3"},{"cm":28.0,"in":11.0,"us":"12","uk":"10.5","eu":"45 1/3"},{"cm":28.4,"in":11.2,"us":"12.5","uk":"11","eu":"46"},{"cm":28.8,"in":11.3,"us":"13","uk":"11.5","eu":"46 2/3"},{"cm":29.3,"in":11.5,"us":"13.5","uk":"12","eu":"47 1/3"},{"cm":29.7,"in":11.7,"us":"14","uk":"12.5","eu":"48"},{"cm":30.1,"in":11.9,"us":"14.5","uk":"13","eu":"48 2/3"},{"cm":30.5,"in":12.0,"us":"15","uk":"13.5","eu":"49 1/3"},{"cm":31.0,"in":12.2,"us":"15.5","uk":"14","eu":"50"}]}},"ASICS":{"men":{"notes":"ASICS offers half sizes and uses Mondopoint cm-based measurement. Generally true-to-size with a snug performance fit.","rows":[{"cm":22.5,"in":8.8582,"us":"4","uk":"3","eu":"36"},{"cm":23.5,"in":9.2519,"us":"5","uk":"4","eu":"37.5"},{"cm":24.0,"in":9.4488,"us":"5.5","uk":"4.5","eu":"38"},{"cm":24.5,"in":9.6456,"us":"6","uk":"5","eu":"39"},{"cm":25.0,"in":9.8425,"us":"6.5","uk":"5.5","eu":"39.5"},{"cm":25.5,"in":10.0394,"us":"7","uk":"6","eu":"40"},{"cm":25.75,"in":10.1378,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7","eu":"41.5"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"7.5","eu":"42"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"43.5"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"44"},{"cm":28.25,"in":11.122,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":28.5,"in":11.2204,"us":"11","uk":"10","eu":"45"},{"cm":29.0,"in":11.4173,"us":"11.5","uk":"10.5","eu":"46"},{"cm":29.5,"in":11.6142,"us":"12","uk":"11","eu":"46.5"},{"cm":30.0,"in":11.811,"us":"12.5","uk":"11.5","eu":"47"},{"cm":30.5,"in":12.0078,"us":"13","uk":"12","eu":"48"},{"cm":30.75,"in":12.1063,"us":"13.5","uk":"12.5","eu":"48.5"},{"cm":31.0,"in":12.2047,"us":"14","uk":"13","eu":"49"},{"cm":32.0,"in":12.5984,"us":"15","uk":"14","eu":"50.5"},{"cm":33.0,"in":12.9921,"us":"16","uk":"15","eu":"51.5"}]},"women":{"notes":"ASICS offers half sizes and uses Mondopoint cm-based measurement. Generally true-to-size with a snug performance fit.","rows":[{"cm":22.0,"in":8.6614,"us":"5","uk":"3","eu":"35.5"},{"cm":22.5,"in":8.8582,"us":"5.5","uk":"3.5","eu":"36"},{"cm":23.0,"in":9.0551,"us":"6","uk":"4","eu":"37"},{"cm":23.5,"in":9.2519,"us":"6.5","uk":"4.5","eu":"37.5"},{"cm":24.0,"in":9.4488,"us":"7","uk":"5","eu":"38"},{"cm":24.5,"in":9.6456,"us":"7.5","uk":"5.5","eu":"39"},{"cm":25.0,"in":9.8425,"us":"8","uk":"6","eu":"39.5"},{"cm":25.5,"in":10.0394,"us":"8.5","uk":"6.5","eu":"40"},{"cm":25.75,"in":10.1378,"us":"9","uk":"7","eu":"40.5"},{"cm":26.0,"in":10.2362,"us":"9.5","uk":"7.5","eu":"41.5"},{"cm":26.5,"in":10.433,"us":"10","uk":"8","eu":"42"},{"cm":27.0,"in":10.6299,"us":"10.5","uk":"8.5","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"11","uk":"9","eu":"43.5"},{"cm":28.0,"in":11.0236,"us":"11.5","uk":"9.5","eu":"44"},{"cm":28.5,"in":11.2204,"us":"12","uk":"10","eu":"44.5"},{"cm":28.75,"in":11.3189,"us":"12.5","uk":"10.5","eu":"45"},{"cm":29.0,"in":11.4173,"us":"13","uk":"11","eu":"46"}]}},"Brooks":{"men":{"notes":"Brooks recommends going half a size to a full size larger than your casual shoe size. Width fittings: B (narrow), D (medium), 2E (wide), 4E (extra wide) for men; 2A (narrow), B (medium), D (wide), 2E (extra wide) for women.","rows":[{"cm":22.44,"in":8.8346,"us":"5","uk":"4","eu":"37.5"},{"cm":22.86,"in":9.0,"us":"5.5","uk":"4.5","eu":"38"},{"cm":23.28,"in":9.1653,"us":"6","uk":"5","eu":"38.5"},{"cm":23.71,"in":9.3346,"us":"6.5","uk":"5.5","eu":"39"},{"cm":24.13,"in":9.5,"us":"7","uk":"6","eu":"40"},{"cm":24.55,"in":9.6653,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":24.98,"in":9.8346,"us":"8","uk":"7","eu":"41"},{"cm":25.4,"in":10.0,"us":"8.5","uk":"7.5","eu":"42"},{"cm":25.82,"in":10.1653,"us":"9","uk":"8","eu":"42.5"},{"cm":26.25,"in":10.3346,"us":"9.5","uk":"8.5","eu":"43"},{"cm":26.67,"in":10.5,"us":"10","uk":"9","eu":"44"},{"cm":27.09,"in":10.6653,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":27.52,"in":10.8346,"us":"11","uk":"10","eu":"45"},{"cm":27.94,"in":11.0,"us":"11.5","uk":"10.5","eu":"45.5"},{"cm":28.36,"in":11.1653,"us":"12","uk":"11","eu":"46"},{"cm":28.79,"in":11.3346,"us":"12.5","uk":"11.5","eu":"46.5"},{"cm":29.21,"in":11.5,"us":"13","uk":"12","eu":"47.5"},{"cm":30.06,"in":11.8346,"us":"14","uk":"13","eu":"48.5"},{"cm":30.9,"in":12.1653,"us":"15","uk":"14","eu":"49.5"},{"cm":31.75,"in":12.5,"us":"16","uk":"15","eu":"50.5"}]},"unisex":{"notes":"Brooks recommends going half a size to a full size larger than your casual shoe size. Width fittings: B (narrow), D (medium), 2E (wide), 4E (extra wide) for men; 2A (narrow), B (medium), D (wide), 2E (extra wide) for women.","rows":[{"cm":22.44,"in":8.8346,"us":"5","uk":"4","eu":"37.5"},{"cm":22.86,"in":9.0,"us":"5.5","uk":"4.5","eu":"38"},{"cm":23.28,"in":9.1653,"us":"6","uk":"5","eu":"38.5"},{"cm":23.71,"in":9.3346,"us":"6.5","uk":"5.5","eu":"39"},{"cm":24.13,"in":9.5,"us":"7","uk":"6","eu":"40"},{"cm":24.55,"in":9.6653,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":24.98,"in":9.8346,"us":"8","uk":"7","eu":"41"},{"cm":25.4,"in":10.0,"us":"8.5","uk":"7.5","eu":"42"},{"cm":25.82,"in":10.1653,"us":"9","uk":"8","eu":"42.5"},{"cm":26.25,"in":10.3346,"us":"9.5","uk":"8.5","eu":"43"},{"cm":26.67,"in":10.5,"us":"10","uk":"9","eu":"44"},{"cm":27.09,"in":10.6653,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":27.52,"in":10.8346,"us":"11","uk":"10","eu":"45"},{"cm":27.94,"in":11.0,"us":"11.5","uk":"10.5","eu":"45.5"},{"cm":28.36,"in":11.1653,"us":"12","uk":"11","eu":"46"},{"cm":28.79,"in":11.3346,"us":"12.5","uk":"11.5","eu":"46.5"},{"cm":29.21,"in":11.5,"us":"13","uk":"12","eu":"47.5"},{"cm":30.06,"in":11.8346,"us":"14","uk":"13","eu":"48.5"},{"cm":30.9,"in":12.1653,"us":"15","uk":"14","eu":"49.5"},{"cm":31.75,"in":12.5,"us":"16","uk":"15","eu":"50.5"}]},"women":{"notes":"Brooks recommends going half a size to a full size larger than your casual shoe size. Width fittings: B (narrow), D (medium), 2E (wide), 4E (extra wide) for men; 2A (narrow), B (medium), D (wide), 2E (extra wide) for women.","rows":[{"cm":21.17,"in":8.3346,"us":"5","uk":"3","eu":"35.5"},{"cm":21.59,"in":8.5,"us":"5.5","uk":"3.5","eu":"36"},{"cm":22.01,"in":8.6653,"us":"6","uk":"4","eu":"36.5"},{"cm":22.44,"in":8.8346,"us":"6.5","uk":"4.5","eu":"37.5"},{"cm":22.86,"in":9.0,"us":"7","uk":"5","eu":"38"},{"cm":23.28,"in":9.1653,"us":"7.5","uk":"5.5","eu":"38.5"},{"cm":23.71,"in":9.3346,"us":"8","uk":"6","eu":"39"},{"cm":24.13,"in":9.5,"us":"8.5","uk":"6.5","eu":"40"},{"cm":24.55,"in":9.6653,"us":"9","uk":"7","eu":"40.5"},{"cm":24.98,"in":9.8346,"us":"9.5","uk":"7.5","eu":"41"},{"cm":25.4,"in":10.0,"us":"10","uk":"8","eu":"42"},{"cm":25.82,"in":10.1653,"us":"10.5","uk":"8.5","eu":"42.5"},{"cm":26.25,"in":10.3346,"us":"11","uk":"9","eu":"43"},{"cm":26.67,"in":10.5,"us":"11.5","uk":"9.5","eu":"44"},{"cm":27.09,"in":10.6653,"us":"12","uk":"10","eu":"44.5"},{"cm":27.52,"in":10.8346,"us":"12.5","uk":"10.5","eu":"45"},{"cm":27.94,"in":11.0,"us":"13","uk":"11","eu":"45.5"}]}},"Converse":{"men":{"notes":"Converse runs half a size large - Converse themselves recommend going down half a size from your usual fit. Classic Chuck Taylor and Chuck 70 models are unisex.","rows":[{"cm":22.0,"in":8.6614,"us":"3","uk":"3","eu":"35"},{"cm":22.5,"in":8.8582,"us":"3.5","uk":"3.5","eu":"36"},{"cm":23.0,"in":9.0551,"us":"4","uk":"4","eu":"36.5"},{"cm":23.5,"in":9.2519,"us":"4.5","uk":"4.5","eu":"37"},{"cm":24.0,"in":9.4488,"us":"5","uk":"5","eu":"37.5"},{"cm":24.5,"in":9.6456,"us":"5.5","uk":"5.5","eu":"38"},{"cm":25.0,"in":9.8425,"us":"6.5","uk":"6.5","eu":"39.5"},{"cm":25.5,"in":10.0394,"us":"7","uk":"7","eu":"40"},{"cm":26.0,"in":10.2362,"us":"7.5","uk":"7.5","eu":"41"},{"cm":26.5,"in":10.433,"us":"8","uk":"8","eu":"41.5"},{"cm":27.0,"in":10.6299,"us":"8.5","uk":"8.5","eu":"42"},{"cm":27.5,"in":10.8268,"us":"9","uk":"9","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"9.5","uk":"9.5","eu":"43"},{"cm":28.5,"in":11.2204,"us":"10","uk":"10","eu":"44"},{"cm":29.0,"in":11.4173,"us":"10.5","uk":"10.5","eu":"44.5"},{"cm":29.5,"in":11.6142,"us":"11","uk":"11","eu":"45"},{"cm":30.0,"in":11.811,"us":"11.5","uk":"11.5","eu":"46"},{"cm":30.5,"in":12.0078,"us":"12","uk":"12","eu":"46.5"},{"cm":31.5,"in":12.4016,"us":"13","uk":"13","eu":"48"},{"cm":32.0,"in":12.5984,"us":"14","uk":"14","eu":"49"},{"cm":33.0,"in":12.9921,"us":"15","uk":"15","eu":"50"}]},"unisex":{"notes":"Converse runs half a size large - Converse themselves recommend going down half a size from your usual fit. Classic Chuck Taylor and Chuck 70 models are unisex.","rows":[{"cm":22.0,"in":8.6614,"us":"3","uk":"3","eu":"35"},{"cm":22.5,"in":8.8582,"us":"3.5","uk":"3.5","eu":"36"},{"cm":23.0,"in":9.0551,"us":"4","uk":"4","eu":"36.5"},{"cm":23.5,"in":9.2519,"us":"4.5","uk":"4.5","eu":"37"},{"cm":24.0,"in":9.4488,"us":"5","uk":"5","eu":"37.5"},{"cm":24.5,"in":9.6456,"us":"5.5","uk":"5.5","eu":"38"},{"cm":25.0,"in":9.8425,"us":"6.5","uk":"6.5","eu":"39.5"},{"cm":25.5,"in":10.0394,"us":"7","uk":"7","eu":"40"},{"cm":26.0,"in":10.2362,"us":"7.5","uk":"7.5","eu":"41"},{"cm":26.5,"in":10.433,"us":"8","uk":"8","eu":"41.5"},{"cm":27.0,"in":10.6299,"us":"8.5","uk":"8.5","eu":"42"},{"cm":27.5,"in":10.8268,"us":"9","uk":"9","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"9.5","uk":"9.5","eu":"43"},{"cm":28.5,"in":11.2204,"us":"10","uk":"10","eu":"44"},{"cm":29.0,"in":11.4173,"us":"10.5","uk":"10.5","eu":"44.5"},{"cm":29.5,"in":11.6142,"us":"11","uk":"11","eu":"45"},{"cm":30.0,"in":11.811,"us":"11.5","uk":"11.5","eu":"46"},{"cm":30.5,"in":12.0078,"us":"12","uk":"12","eu":"46.5"},{"cm":31.5,"in":12.4016,"us":"13","uk":"13","eu":"48"},{"cm":32.0,"in":12.5984,"us":"14","uk":"14","eu":"49"},{"cm":33.0,"in":12.9921,"us":"15","uk":"15","eu":"50"}]},"women":{"notes":"Converse runs half a size large - Converse themselves recommend going down half a size from your usual fit. Classic Chuck Taylor and Chuck 70 models are unisex.","rows":[{"cm":22.0,"in":8.6614,"us":"5","uk":"3","eu":"35"},{"cm":22.5,"in":8.8582,"us":"5.5","uk":"3.5","eu":"36"},{"cm":23.0,"in":9.0551,"us":"6","uk":"4","eu":"36.5"},{"cm":23.5,"in":9.2519,"us":"6.5","uk":"4.5","eu":"37"},{"cm":24.0,"in":9.4488,"us":"7","uk":"5","eu":"37.5"},{"cm":24.5,"in":9.6456,"us":"7.5","uk":"5.5","eu":"38"},{"cm":25.0,"in":9.8425,"us":"8.5","uk":"6.5","eu":"39.5"},{"cm":25.5,"in":10.0394,"us":"9","uk":"7","eu":"40"},{"cm":26.0,"in":10.2362,"us":"9.5","uk":"7.5","eu":"41"},{"cm":26.5,"in":10.433,"us":"10","uk":"8","eu":"41.5"},{"cm":27.0,"in":10.6299,"us":"10.5","uk":"8.5","eu":"42"},{"cm":27.5,"in":10.8268,"us":"11","uk":"9","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"11.5","uk":"9.5","eu":"43"},{"cm":28.5,"in":11.2204,"us":"12","uk":"10","eu":"44"},{"cm":29.0,"in":11.4173,"us":"12.5","uk":"10.5","eu":"44.5"},{"cm":29.5,"in":11.6142,"us":"13","uk":"11","eu":"45"},{"cm":30.0,"in":11.811,"us":"13.5","uk":"11.5","eu":"46"},{"cm":30.5,"in":12.0078,"us":"14","uk":"12","eu":"46.5"},{"cm":31.5,"in":12.4016,"us":"15","uk":"13","eu":"48"},{"cm":32.0,"in":12.5984,"us":"16","uk":"14","eu":"49"},{"cm":33.0,"in":12.9921,"us":"17","uk":"15","eu":"50"}]}},"Hoka":{"men":{"notes":"Hoka runs slightly small in the toebox - consider going up half a size. Available widths: D (Standard), 2E (Wide), 4E (X-Wide).","rows":[{"cm":24.3,"in":9.6,"us":"6.5","uk":"6","eu":"39 1/3"},{"cm":24.7,"in":9.7,"us":"7","uk":"6.5","eu":"40"},{"cm":25.1,"in":9.9,"us":"7.5","uk":"7","eu":"40 2/3"},{"cm":25.6,"in":10.1,"us":"8","uk":"7.5","eu":"41 1/3"},{"cm":26.0,"in":10.2,"us":"8.5","uk":"8","eu":"42"},{"cm":26.4,"in":10.4,"us":"9","uk":"8.5","eu":"42 2/3"},{"cm":26.8,"in":10.6,"us":"9.5","uk":"9","eu":"43 1/3"},{"cm":27.2,"in":10.7,"us":"10","uk":"9.5","eu":"44"},{"cm":27.7,"in":10.9,"us":"10.5","uk":"10","eu":"44 2/3"},{"cm":28.1,"in":11.1,"us":"11","uk":"10.5","eu":"45 1/3"},{"cm":28.5,"in":11.2,"us":"11.5","uk":"11","eu":"46"},{"cm":28.9,"in":11.4,"us":"12","uk":"11.5","eu":"46 2/3"},{"cm":29.4,"in":11.6,"us":"12.5","uk":"12","eu":"47 1/3"},{"cm":29.8,"in":11.9,"us":"13","uk":"12.5","eu":"48"},{"cm":30.2,"in":11.7,"us":"13.5","uk":"13","eu":"48 2/3"},{"cm":30.6,"in":12.0,"us":"14","uk":"13.5","eu":"49 1/3"},{"cm":31.1,"in":12.2,"us":"14.5","uk":"14","eu":"50"},{"cm":31.5,"in":12.4,"us":"15","uk":"14.5","eu":"50 2/3"},{"cm":31.9,"in":12.6,"us":"15.5","uk":"15","eu":"51 1/3"},{"cm":32.3,"in":12.7,"us":"16","uk":"15.5","eu":"52"}]},"women":{"notes":"Hoka runs slightly small in the toebox - consider going up half a size. Available widths: B (Standard), D (Wide).","rows":[{"cm":22.0,"in":8.6614,"us":"5","uk":"3.5","eu":"36"},{"cm":22.4,"in":8.8189,"us":"5.5","uk":"4","eu":"36 2/3"},{"cm":22.9,"in":9.0157,"us":"6","uk":"4.5","eu":"37 1/3"},{"cm":23.3,"in":9.1732,"us":"6.5","uk":"5","eu":"38"},{"cm":23.7,"in":9.3307,"us":"7","uk":"5.5","eu":"38 2/3"},{"cm":24.1,"in":9.4882,"us":"7.5","uk":"6","eu":"39 1/3"},{"cm":24.5,"in":9.6456,"us":"8","uk":"6.5","eu":"40"},{"cm":25.0,"in":9.8425,"us":"8.5","uk":"7","eu":"40 2/3"},{"cm":25.4,"in":10.0,"us":"9","uk":"7.5","eu":"41 1/3"},{"cm":25.8,"in":10.1575,"us":"9.5","uk":"8","eu":"42"},{"cm":26.2,"in":10.3149,"us":"10","uk":"8.5","eu":"42 2/3"},{"cm":26.7,"in":10.5118,"us":"10.5","uk":"9","eu":"43 1/3"},{"cm":27.1,"in":10.6693,"us":"11","uk":"9.5","eu":"44"},{"cm":27.5,"in":10.8268,"us":"11.5","uk":"10","eu":"44 2/3"},{"cm":27.9,"in":10.9842,"us":"12","uk":"10.5","eu":"45 1/3"}]}},"Jordan":{"men":{"notes":"Jordan Brand uses Nike sizing. Air Jordan 1 and 2 fit true to size. Retro Air Jordans (3-14) tend to run small - consider going up half a size. Wide feet: size up half a size on most models. Performance Jordans (36+) follow standard Nike sizing.","rows":[{"cm":21.6,"in":8.5039,"us":"3.5","uk":"3","eu":"35.5"},{"cm":22.0,"in":8.6614,"us":"4","uk":"3.5","eu":"36"},{"cm":22.4,"in":8.8189,"us":"4.5","uk":"4","eu":"36.5"},{"cm":22.9,"in":9.0157,"us":"5","uk":"4.5","eu":"37.5"},{"cm":23.3,"in":9.1732,"us":"5.5","uk":"5","eu":"38"},{"cm":23.7,"in":9.3307,"us":"6","uk":"5.5","eu":"38.5"},{"cm":24.1,"in":9.4882,"us":"6.5","uk":"6","eu":"39"},{"cm":24.5,"in":9.6456,"us":"7","uk":"6","eu":"40"},{"cm":25.0,"in":9.8425,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":25.4,"in":10.0,"us":"8","uk":"7","eu":"41"},{"cm":25.8,"in":10.1575,"us":"8.5","uk":"7.5","eu":"42"},{"cm":26.2,"in":10.3149,"us":"9","uk":"8","eu":"42.5"},{"cm":26.7,"in":10.5118,"us":"9.5","uk":"8.5","eu":"43"},{"cm":27.1,"in":10.6693,"us":"10","uk":"9","eu":"44"},{"cm":27.5,"in":10.8268,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":27.9,"in":10.9842,"us":"11","uk":"10","eu":"45"},{"cm":28.3,"in":11.1417,"us":"11.5","uk":"10.5","eu":"45.5"},{"cm":28.8,"in":11.3386,"us":"12","uk":"11","eu":"46"},{"cm":29.2,"in":11.496,"us":"12.5","uk":"11.5","eu":"47"},{"cm":29.6,"in":11.6535,"us":"13","uk":"12","eu":"47.5"},{"cm":30.0,"in":11.811,"us":"13.5","uk":"12.5","eu":"48"},{"cm":30.5,"in":12.0078,"us":"14","uk":"13","eu":"48.5"},{"cm":30.9,"in":12.1653,"us":"14.5","uk":"13.5","eu":"49"},{"cm":31.3,"in":12.3228,"us":"15","uk":"14","eu":"49.5"},{"cm":31.7,"in":12.4803,"us":"15.5","uk":"14.5","eu":"50"},{"cm":32.2,"in":12.6771,"us":"16","uk":"15","eu":"50.5"},{"cm":32.6,"in":12.8346,"us":"16.5","uk":"15.5","eu":"51"},{"cm":33.0,"in":12.9921,"us":"17","uk":"16","eu":"51.5"},{"cm":33.4,"in":13.1496,"us":"17.5","uk":"16.5","eu":"52"},{"cm":33.9,"in":13.3464,"us":"18","uk":"17","eu":"52.5"},{"cm":34.3,"in":13.5039,"us":"18.5","uk":"17.5","eu":"53"},{"cm":34.7,"in":13.6614,"us":"19","uk":"18","eu":"53.5"},{"cm":35.1,"in":13.8189,"us":"19.5","uk":"18.5","eu":"54"},{"cm":35.5,"in":13.9764,"us":"20","uk":"19","eu":"54.5"},{"cm":36.0,"in":14.1732,"us":"20.5","uk":"19.5","eu":"55"},{"cm":36.4,"in":14.3307,"us":"21","uk":"20","eu":"55.5"},{"cm":36.8,"in":14.4882,"us":"21.5","uk":"20.5","eu":"56"},{"cm":37.2,"in":14.6456,"us":"22","uk":"21","eu":"56.5"}]},"unisex":{"notes":"Jordan Brand uses Nike sizing. Air Jordan 1 and 2 fit true to size. Retro Air Jordans (3-14) tend to run small - consider going up half a size. Wide feet: size up half a size on most models. Performance Jordans (36+) follow standard Nike sizing.","rows":[{"cm":21.6,"in":8.5039,"us":"3.5","uk":"3","eu":"35.5"},{"cm":22.0,"in":8.6614,"us":"4","uk":"3.5","eu":"36"},{"cm":22.4,"in":8.8189,"us":"4.5","uk":"4","eu":"36.5"},{"cm":22.9,"in":9.0157,"us":"5","uk":"4.5","eu":"37.5"},{"cm":23.3,"in":9.1732,"us":"5.5","uk":"5","eu":"38"},{"cm":23.7,"in":9.3307,"us":"6","uk":"5.5","eu":"38.5"},{"cm":24.1,"in":9.4882,"us":"6.5","uk":"6","eu":"39"},{"cm":24.5,"in":9.6456,"us":"7","uk":"6","eu":"40"},{"cm":25.0,"in":9.8425,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":25.4,"in":10.0,"us":"8","uk":"7","eu":"41"},{"cm":25.8,"in":10.1575,"us":"8.5","uk":"7.5","eu":"42"},{"cm":26.2,"in":10.3149,"us":"9","uk":"8","eu":"42.5"},{"cm":26.7,"in":10.5118,"us":"9.5","uk":"8.5","eu":"43"},{"cm":27.1,"in":10.6693,"us":"10","uk":"9","eu":"44"},{"cm":27.5,"in":10.8268,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":27.9,"in":10.9842,"us":"11","uk":"10","eu":"45"},{"cm":28.3,"in":11.1417,"us":"11.5","uk":"10.5","eu":"45.5"},{"cm":28.8,"in":11.3386,"us":"12","uk":"11","eu":"46"},{"cm":29.2,"in":11.496,"us":"12.5","uk":"11.5","eu":"47"},{"cm":29.6,"in":11.6535,"us":"13","uk":"12","eu":"47.5"},{"cm":30.0,"in":11.811,"us":"13.5","uk":"12.5","eu":"48"},{"cm":30.5,"in":12.0078,"us":"14","uk":"13","eu":"48.5"},{"cm":30.9,"in":12.1653,"us":"14.5","uk":"13.5","eu":"49"},{"cm":31.3,"in":12.3228,"us":"15","uk":"14","eu":"49.5"},{"cm":31.7,"in":12.4803,"us":"15.5","uk":"14.5","eu":"50"},{"cm":32.2,"in":12.6771,"us":"16","uk":"15","eu":"50.5"},{"cm":32.6,"in":12.8346,"us":"16.5","uk":"15.5","eu":"51"},{"cm":33.0,"in":12.9921,"us":"17","uk":"16","eu":"51.5"},{"cm":33.4,"in":13.1496,"us":"17.5","uk":"16.5","eu":"52"},{"cm":33.9,"in":13.3464,"us":"18","uk":"17","eu":"52.5"},{"cm":34.3,"in":13.5039,"us":"18.5","uk":"17.5","eu":"53"},{"cm":34.7,"in":13.6614,"us":"19","uk":"18","eu":"53.5"},{"cm":35.1,"in":13.8189,"us":"19.5","uk":"18.5","eu":"54"},{"cm":35.5,"in":13.9764,"us":"20","uk":"19","eu":"54.5"},{"cm":36.0,"in":14.1732,"us":"20.5","uk":"19.5","eu":"55"},{"cm":36.4,"in":14.3307,"us":"21","uk":"20","eu":"55.5"},{"cm":36.8,"in":14.4882,"us":"21.5","uk":"20.5","eu":"56"},{"cm":37.2,"in":14.6456,"us":"22","uk":"21","eu":"56.5"}]},"women":{"notes":"Jordan Brand uses Nike sizing. Air Jordan 1 and 2 fit true to size. Retro Air Jordans (3-14) tend to run small - consider going up half a size. Wide feet: size up half a size on most models. Performance Jordans (36+) follow standard Nike sizing.","rows":[{"cm":20.8,"in":8.189,"us":"3.5","uk":"1.5","eu":"33.5"},{"cm":21.2,"in":8.3464,"us":"4","uk":"1.5","eu":"34.5"},{"cm":21.6,"in":8.5039,"us":"4.5","uk":"2","eu":"35"},{"cm":22.0,"in":8.6614,"us":"5","uk":"2.5","eu":"35.5"},{"cm":22.4,"in":8.8189,"us":"5.5","uk":"3","eu":"36"},{"cm":22.9,"in":9.0157,"us":"6","uk":"3.5","eu":"36.5"},{"cm":23.3,"in":9.1732,"us":"6.5","uk":"4","eu":"37.5"},{"cm":23.7,"in":9.3307,"us":"7","uk":"4.5","eu":"38"},{"cm":24.1,"in":9.4882,"us":"7.5","uk":"5","eu":"38.5"},{"cm":24.5,"in":9.6456,"us":"8","uk":"5.5","eu":"39"},{"cm":25.0,"in":9.8425,"us":"8.5","uk":"6","eu":"40"},{"cm":25.4,"in":10.0,"us":"9","uk":"6.5","eu":"40.5"},{"cm":25.8,"in":10.1575,"us":"9.5","uk":"7","eu":"41"},{"cm":26.2,"in":10.3149,"us":"10","uk":"7.5","eu":"42"},{"cm":26.7,"in":10.5118,"us":"10.5","uk":"8","eu":"42.5"},{"cm":27.1,"in":10.6693,"us":"11","uk":"8.5","eu":"43"},{"cm":27.5,"in":10.8268,"us":"11.5","uk":"9","eu":"44"},{"cm":27.9,"in":10.9842,"us":"12","uk":"9.5","eu":"44.5"},{"cm":28.3,"in":11.1417,"us":"12.5","uk":"10","eu":"45"},{"cm":28.8,"in":11.3386,"us":"13","uk":"10.5","eu":"45.5"},{"cm":29.2,"in":11.496,"us":"13.5","uk":"11","eu":"46"},{"cm":29.6,"in":11.6535,"us":"14","uk":"11.5","eu":"47"},{"cm":30.0,"in":11.811,"us":"14.5","uk":"12","eu":"47.5"},{"cm":30.5,"in":12.0078,"us":"15","uk":"12.5","eu":"48"},{"cm":30.9,"in":12.1653,"us":"15.5","uk":"13","eu":"48.5"},{"cm":31.3,"in":12.3228,"us":"16","uk":"13.5","eu":"49"},{"cm":31.7,"in":12.4803,"us":"16.5","uk":"14","eu":"50"},{"cm":32.2,"in":12.6771,"us":"17","uk":"14.5","eu":"50.5"}]}},"Karhu":{"unisex":{"notes":"Karhu (Finnish for 'bear') is a Finnish running brand that uses unisex sizing. Men and women fall into the same size for the same foot length. Known for F-Mesh construction and Fulcrum technology.","rows":[{"cm":23.0,"in":9.0551,"us":"4","uk":"3","eu":"35"},{"cm":23.4,"in":9.2126,"us":"4.5","uk":"3.5","eu":"36"},{"cm":23.8,"in":9.3701,"us":"5","uk":"4","eu":"37"},{"cm":24.3,"in":9.5669,"us":"5.5","uk":"4.5","eu":"38"},{"cm":24.6,"in":9.685,"us":"6","uk":"5","eu":"39"},{"cm":25.1,"in":9.8819,"us":"6.5","uk":"5.5","eu":"39.5"},{"cm":25.5,"in":10.0394,"us":"7","uk":"6","eu":"40"},{"cm":25.9,"in":10.1968,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":26.3,"in":10.3543,"us":"8","uk":"7","eu":"41.5"},{"cm":26.8,"in":10.5512,"us":"8.5","uk":"7.5","eu":"42"},{"cm":27.2,"in":10.7086,"us":"9","uk":"8","eu":"42.5"},{"cm":27.6,"in":10.8661,"us":"9.5","uk":"8.5","eu":"43.5"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"44"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":28.9,"in":11.3779,"us":"11","uk":"10","eu":"45"},{"cm":29.3,"in":11.5354,"us":"11.5","uk":"10.5","eu":"46"},{"cm":29.7,"in":11.6929,"us":"12","uk":"11","eu":"46.5"},{"cm":30.1,"in":11.8504,"us":"12.5","uk":"11.5","eu":"47"},{"cm":30.6,"in":12.0472,"us":"13","uk":"12","eu":"48"},{"cm":31.0,"in":12.2047,"us":"14","uk":"13","eu":"49"},{"cm":31.8,"in":12.5197,"us":"15","uk":"14","eu":"50.5"},{"cm":32.7,"in":12.874,"us":"16","uk":"15","eu":"51.5"}]}},"Mizuno":{"men":{"notes":"Mizuno's unisex models follow men's sizing in D-width. Available in width fittings: 2A/B narrow, B/D standard, D/2E wide, 2E/4E extra wide (women/men).","rows":[{"cm":23.5,"in":9.2519,"us":"5.5","uk":"4.5","eu":"37"},{"cm":24.0,"in":9.4488,"us":"6","uk":"5","eu":"38"},{"cm":24.5,"in":9.6456,"us":"6.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8425,"us":"7","uk":"6","eu":"39"},{"cm":25.5,"in":10.0394,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8","eu":"42"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"43"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.811,"us":"12","uk":"11","eu":"46"},{"cm":30.5,"in":12.0078,"us":"12.5","uk":"11.5","eu":"46.5"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12","eu":"47"},{"cm":32.0,"in":12.5984,"us":"14","uk":"13","eu":"48.5"},{"cm":33.0,"in":12.9921,"us":"15","uk":"14","eu":"49"}]},"unisex":{"notes":"Mizuno's unisex models follow men's sizing in D-width. Available in width fittings: 2A/B narrow, B/D standard, D/2E wide, 2E/4E extra wide (women/men).","rows":[{"cm":23.5,"in":9.2519,"us":"5.5","uk":"4.5","eu":"37"},{"cm":24.0,"in":9.4488,"us":"6","uk":"5","eu":"38"},{"cm":24.5,"in":9.6456,"us":"6.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8425,"us":"7","uk":"6","eu":"39"},{"cm":25.5,"in":10.0394,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8","eu":"42"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"43"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.811,"us":"12","uk":"11","eu":"46"},{"cm":30.5,"in":12.0078,"us":"12.5","uk":"11.5","eu":"46.5"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12","eu":"47"},{"cm":32.0,"in":12.5984,"us":"14","uk":"13","eu":"48.5"},{"cm":33.0,"in":12.9921,"us":"15","uk":"14","eu":"49"}]},"women":{"notes":"Mizuno's unisex models follow men's sizing in D-width. Available in width fittings: 2A/B narrow, B/D standard, D/2E wide, 2E/4E extra wide (women/men).","rows":[{"cm":21.5,"in":8.4645,"us":"5","uk":"2.5","eu":"35"},{"cm":22.0,"in":8.6614,"us":"5.5","uk":"3","eu":"35.5"},{"cm":22.5,"in":8.8582,"us":"6","uk":"3.5","eu":"36"},{"cm":23.0,"in":9.0551,"us":"6.5","uk":"4","eu":"36.5"},{"cm":23.5,"in":9.2519,"us":"7","uk":"4.5","eu":"37"},{"cm":24.0,"in":9.4488,"us":"7.5","uk":"5","eu":"38"},{"cm":24.5,"in":9.6456,"us":"8","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8425,"us":"8.5","uk":"6","eu":"39"},{"cm":25.5,"in":10.0394,"us":"9","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2362,"us":"9.5","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.433,"us":"10","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6299,"us":"10.5","uk":"8","eu":"42"},{"cm":27.5,"in":10.8268,"us":"11","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"11.5","uk":"9","eu":"43"},{"cm":28.5,"in":11.2204,"us":"12","uk":"9.5","eu":"44"}]}},"New Balance":{"men":{"notes":"New Balance is known for width fittings. Available in: 2A (Narrow), B (Standard women), D (Standard men), 2E (Wide), 4E (X-Wide).","rows":[{"cm":20.5,"in":8.0709,"us":"2.5","uk":"2","eu":"34"},{"cm":21.0,"in":8.2677,"us":"3","uk":"2.5","eu":"35"},{"cm":21.5,"in":8.4645,"us":"3.5","uk":"3","eu":"35.5"},{"cm":22.0,"in":8.6614,"us":"4","uk":"3.5","eu":"36"},{"cm":22.5,"in":8.8582,"us":"4.5","uk":"4","eu":"37"},{"cm":23.0,"in":9.0551,"us":"5","uk":"4.5","eu":"37.5"},{"cm":23.5,"in":9.2519,"us":"5.5","uk":"5","eu":"38"},{"cm":24.0,"in":9.4488,"us":"6","uk":"5.5","eu":"38.5"},{"cm":24.5,"in":9.6456,"us":"6.5","uk":"6","eu":"39.5"},{"cm":25.0,"in":9.8425,"us":"7","uk":"6.5","eu":"40"},{"cm":25.5,"in":10.0394,"us":"7.5","uk":"7","eu":"40.5"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7.5","eu":"41.5"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"8","eu":"42"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8.5","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"9","eu":"43"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9.5","eu":"44"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"10","eu":"44.5"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10.5","eu":"45"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"11","eu":"45.5"},{"cm":30.0,"in":11.811,"us":"12","uk":"11.5","eu":"46.5"},{"cm":30.5,"in":12.0078,"us":"12.5","uk":"12","eu":"47"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12.5","eu":"47.5"},{"cm":31.5,"in":12.4016,"us":"13.5","uk":"13","eu":"48.5"},{"cm":32.0,"in":12.5984,"us":"14","uk":"13.5","eu":"49"},{"cm":33.0,"in":12.9921,"us":"15","uk":"14.5","eu":"50"},{"cm":34.0,"in":13.3858,"us":"16","uk":"15.5","eu":"51"},{"cm":35.0,"in":13.7795,"us":"17","uk":"16.5","eu":"52"},{"cm":36.0,"in":14.1732,"us":"18","uk":"17.5","eu":"53"},{"cm":37.0,"in":14.5669,"us":"19","uk":"18.5","eu":"54"},{"cm":38.0,"in":14.9606,"us":"20","uk":"19.5","eu":"55"}]},"unisex":{"notes":"New Balance is known for width fittings. Available in: 2A (Narrow), B (Standard women), D (Standard men), 2E (Wide), 4E (X-Wide).","rows":[{"cm":20.5,"in":8.0709,"us":"2.5","uk":"2","eu":"34"},{"cm":21.0,"in":8.2677,"us":"3","uk":"2.5","eu":"35"},{"cm":21.5,"in":8.4645,"us":"3.5","uk":"3","eu":"35.5"},{"cm":22.0,"in":8.6614,"us":"4","uk":"3.5","eu":"36"},{"cm":22.5,"in":8.8582,"us":"4.5","uk":"4","eu":"37"},{"cm":23.0,"in":9.0551,"us":"5","uk":"4.5","eu":"37.5"},{"cm":23.5,"in":9.2519,"us":"5.5","uk":"5","eu":"38"},{"cm":24.0,"in":9.4488,"us":"6","uk":"5.5","eu":"38.5"},{"cm":24.5,"in":9.6456,"us":"6.5","uk":"6","eu":"39.5"},{"cm":25.0,"in":9.8425,"us":"7","uk":"6.5","eu":"40"},{"cm":25.5,"in":10.0394,"us":"7.5","uk":"7","eu":"40.5"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7.5","eu":"41.5"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"8","eu":"42"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8.5","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"9","eu":"43"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9.5","eu":"44"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"10","eu":"44.5"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10.5","eu":"45"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"11","eu":"45.5"},{"cm":30.0,"in":11.811,"us":"12","uk":"11.5","eu":"46.5"},{"cm":30.5,"in":12.0078,"us":"12.5","uk":"12","eu":"47"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12.5","eu":"47.5"},{"cm":31.5,"in":12.4016,"us":"13.5","uk":"13","eu":"48.5"},{"cm":32.0,"in":12.5984,"us":"14","uk":"13.5","eu":"49"},{"cm":33.0,"in":12.9921,"us":"15","uk":"14.5","eu":"50"},{"cm":34.0,"in":13.3858,"us":"16","uk":"15.5","eu":"51"},{"cm":35.0,"in":13.7795,"us":"17","uk":"16.5","eu":"52"},{"cm":36.0,"in":14.1732,"us":"18","uk":"17.5","eu":"53"},{"cm":37.0,"in":14.5669,"us":"19","uk":"18.5","eu":"54"},{"cm":38.0,"in":14.9606,"us":"20","uk":"19.5","eu":"55"}]},"women":{"notes":"New Balance is known for width fittings. Available in: 2A (Narrow), B (Standard women), D (Standard men), 2E (Wide), 4E (X-Wide).","rows":[{"cm":20.0,"in":7.874,"us":"3","uk":"1","eu":"33"},{"cm":20.5,"in":8.0709,"us":"3.5","uk":"1.5","eu":"33.5"},{"cm":21.0,"in":8.2677,"us":"4","uk":"2","eu":"34"},{"cm":21.5,"in":8.4645,"us":"4.5","uk":"2.5","eu":"34.5"},{"cm":22.0,"in":8.6614,"us":"5","uk":"3","eu":"35"},{"cm":22.5,"in":8.8582,"us":"5.5","uk":"3.5","eu":"36"},{"cm":23.0,"in":9.0551,"us":"6","uk":"4","eu":"36.5"},{"cm":23.5,"in":9.2519,"us":"6.5","uk":"4.5","eu":"37"},{"cm":24.0,"in":9.4488,"us":"7","uk":"5","eu":"37.5"},{"cm":24.5,"in":9.6456,"us":"7.5","uk":"5.5","eu":"38"},{"cm":25.0,"in":9.8425,"us":"8","uk":"6","eu":"39"},{"cm":25.5,"in":10.0394,"us":"8.5","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2362,"us":"9","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.433,"us":"9.5","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6299,"us":"10","uk":"8","eu":"41.5"},{"cm":27.5,"in":10.8268,"us":"10.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"11","uk":"9","eu":"43"},{"cm":28.5,"in":11.2204,"us":"11.5","uk":"9.5","eu":"43.5"},{"cm":29.0,"in":11.4173,"us":"12","uk":"10","eu":"44"},{"cm":29.5,"in":11.6142,"us":"12.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.811,"us":"13","uk":"11","eu":"45.5"},{"cm":30.5,"in":12.0078,"us":"13.5","uk":"11.5","eu":"46"},{"cm":31.0,"in":12.2047,"us":"14","uk":"12","eu":"46.5"},{"cm":32.0,"in":12.5984,"us":"15","uk":"13","eu":"48"},{"cm":32.5,"in":12.7952,"us":"16","uk":"14","eu":"49"}]}},"Nike":{"men":{"notes":"Nike runs slightly on the narrow side. When in doubt, go up half a size (Nike's own recommendation).","rows":[{"cm":21.6,"in":8.5039,"us":"3.5","uk":"3","eu":"35.5"},{"cm":22.0,"in":8.6614,"us":"4","uk":"3.5","eu":"36"},{"cm":22.4,"in":8.8189,"us":"4.5","uk":"4","eu":"36.5"},{"cm":22.9,"in":9.0157,"us":"5","uk":"4.5","eu":"37.5"},{"cm":23.3,"in":9.1732,"us":"5.5","uk":"5","eu":"38"},{"cm":23.7,"in":9.3307,"us":"6","uk":"5.5","eu":"38.5"},{"cm":24.1,"in":9.4882,"us":"6.5","uk":"6","eu":"39"},{"cm":24.5,"in":9.6456,"us":"7","uk":"6","eu":"40"},{"cm":25.0,"in":9.8425,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":25.4,"in":10.0,"us":"8","uk":"7","eu":"41"},{"cm":25.8,"in":10.1575,"us":"8.5","uk":"7.5","eu":"42"},{"cm":26.2,"in":10.3149,"us":"9","uk":"8","eu":"42.5"},{"cm":26.7,"in":10.5118,"us":"9.5","uk":"8.5","eu":"43"},{"cm":27.1,"in":10.6693,"us":"10","uk":"9","eu":"44"},{"cm":27.5,"in":10.8268,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":27.9,"in":10.9842,"us":"11","uk":"10","eu":"45"},{"cm":28.3,"in":11.1417,"us":"11.5","uk":"10.5","eu":"45.5"},{"cm":28.8,"in":11.3386,"us":"12","uk":"11","eu":"46"},{"cm":29.2,"in":11.496,"us":"12.5","uk":"11.5","eu":"47"},{"cm":29.6,"in":11.6535,"us":"13","uk":"12","eu":"47.5"},{"cm":30.0,"in":11.811,"us":"13.5","uk":"12.5","eu":"48"},{"cm":30.5,"in":12.0078,"us":"14","uk":"13","eu":"48.5"},{"cm":30.9,"in":12.1653,"us":"14.5","uk":"13.5","eu":"49"},{"cm":31.3,"in":12.3228,"us":"15","uk":"14","eu":"49.5"},{"cm":31.7,"in":12.4803,"us":"15.5","uk":"14.5","eu":"50"},{"cm":32.2,"in":12.6771,"us":"16","uk":"15","eu":"50.5"},{"cm":32.6,"in":12.8346,"us":"16.5","uk":"15.5","eu":"51"},{"cm":33.0,"in":12.9921,"us":"17","uk":"16","eu":"51.5"},{"cm":33.4,"in":13.1496,"us":"17.5","uk":"16.5","eu":"52"},{"cm":33.9,"in":13.3464,"us":"18","uk":"17","eu":"52.5"},{"cm":34.3,"in":13.5039,"us":"18.5","uk":"17.5","eu":"53"},{"cm":34.7,"in":13.6614,"us":"19","uk":"18","eu":"53.5"},{"cm":35.1,"in":13.8189,"us":"19.5","uk":"18.5","eu":"54"},{"cm":35.5,"in":13.9764,"us":"20","uk":"19","eu":"54.5"},{"cm":36.0,"in":14.1732,"us":"20.5","uk":"19.5","eu":"55"},{"cm":36.4,"in":14.3307,"us":"21","uk":"20","eu":"55.5"},{"cm":36.8,"in":14.4882,"us":"21.5","uk":"20.5","eu":"56"},{"cm":37.2,"in":14.6456,"us":"22","uk":"21","eu":"56.5"}]},"unisex":{"notes":"Nike runs slightly on the narrow side. When in doubt, go up half a size (Nike's own recommendation).","rows":[{"cm":21.6,"in":8.5039,"us":"3.5","uk":"3","eu":"35.5"},{"cm":22.0,"in":8.6614,"us":"4","uk":"3.5","eu":"36"},{"cm":22.4,"in":8.8189,"us":"4.5","uk":"4","eu":"36.5"},{"cm":22.9,"in":9.0157,"us":"5","uk":"4.5","eu":"37.5"},{"cm":23.3,"in":9.1732,"us":"5.5","uk":"5","eu":"38"},{"cm":23.7,"in":9.3307,"us":"6","uk":"5.5","eu":"38.5"},{"cm":24.1,"in":9.4882,"us":"6.5","uk":"6","eu":"39"},{"cm":24.5,"in":9.6456,"us":"7","uk":"6","eu":"40"},{"cm":25.0,"in":9.8425,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":25.4,"in":10.0,"us":"8","uk":"7","eu":"41"},{"cm":25.8,"in":10.1575,"us":"8.5","uk":"7.5","eu":"42"},{"cm":26.2,"in":10.3149,"us":"9","uk":"8","eu":"42.5"},{"cm":26.7,"in":10.5118,"us":"9.5","uk":"8.5","eu":"43"},{"cm":27.1,"in":10.6693,"us":"10","uk":"9","eu":"44"},{"cm":27.5,"in":10.8268,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":27.9,"in":10.9842,"us":"11","uk":"10","eu":"45"},{"cm":28.3,"in":11.1417,"us":"11.5","uk":"10.5","eu":"45.5"},{"cm":28.8,"in":11.3386,"us":"12","uk":"11","eu":"46"},{"cm":29.2,"in":11.496,"us":"12.5","uk":"11.5","eu":"47"},{"cm":29.6,"in":11.6535,"us":"13","uk":"12","eu":"47.5"},{"cm":30.0,"in":11.811,"us":"13.5","uk":"12.5","eu":"48"},{"cm":30.5,"in":12.0078,"us":"14","uk":"13","eu":"48.5"},{"cm":30.9,"in":12.1653,"us":"14.5","uk":"13.5","eu":"49"},{"cm":31.3,"in":12.3228,"us":"15","uk":"14","eu":"49.5"},{"cm":31.7,"in":12.4803,"us":"15.5","uk":"14.5","eu":"50"},{"cm":32.2,"in":12.6771,"us":"16","uk":"15","eu":"50.5"},{"cm":32.6,"in":12.8346,"us":"16.5","uk":"15.5","eu":"51"},{"cm":33.0,"in":12.9921,"us":"17","uk":"16","eu":"51.5"},{"cm":33.4,"in":13.1496,"us":"17.5","uk":"16.5","eu":"52"},{"cm":33.9,"in":13.3464,"us":"18","uk":"17","eu":"52.5"},{"cm":34.3,"in":13.5039,"us":"18.5","uk":"17.5","eu":"53"},{"cm":34.7,"in":13.6614,"us":"19","uk":"18","eu":"53.5"},{"cm":35.1,"in":13.8189,"us":"19.5","uk":"18.5","eu":"54"},{"cm":35.5,"in":13.9764,"us":"20","uk":"19","eu":"54.5"},{"cm":36.0,"in":14.1732,"us":"20.5","uk":"19.5","eu":"55"},{"cm":36.4,"in":14.3307,"us":"21","uk":"20","eu":"55.5"},{"cm":36.8,"in":14.4882,"us":"21.5","uk":"20.5","eu":"56"},{"cm":37.2,"in":14.6456,"us":"22","uk":"21","eu":"56.5"}]},"women":{"notes":"Nike runs slightly on the narrow side. When in doubt, go up half a size (Nike's own recommendation).","rows":[{"cm":20.8,"in":8.189,"us":"3.5","uk":"1.5","eu":"33.5"},{"cm":21.2,"in":8.3464,"us":"4","uk":"1.5","eu":"34.5"},{"cm":21.6,"in":8.5039,"us":"4.5","uk":"2","eu":"35"},{"cm":22.0,"in":8.6614,"us":"5","uk":"2.5","eu":"35.5"},{"cm":22.4,"in":8.8189,"us":"5.5","uk":"3","eu":"36"},{"cm":22.9,"in":9.0157,"us":"6","uk":"3.5","eu":"36.5"},{"cm":23.3,"in":9.1732,"us":"6.5","uk":"4","eu":"37.5"},{"cm":23.7,"in":9.3307,"us":"7","uk":"4.5","eu":"38"},{"cm":24.1,"in":9.4882,"us":"7.5","uk":"5","eu":"38.5"},{"cm":24.5,"in":9.6456,"us":"8","uk":"5.5","eu":"39"},{"cm":25.0,"in":9.8425,"us":"8.5","uk":"6","eu":"40"},{"cm":25.4,"in":10.0,"us":"9","uk":"6.5","eu":"40.5"},{"cm":25.8,"in":10.1575,"us":"9.5","uk":"7","eu":"41"},{"cm":26.2,"in":10.3149,"us":"10","uk":"7.5","eu":"42"},{"cm":26.7,"in":10.5118,"us":"10.5","uk":"8","eu":"42.5"},{"cm":27.1,"in":10.6693,"us":"11","uk":"8.5","eu":"43"},{"cm":27.5,"in":10.8268,"us":"11.5","uk":"9","eu":"44"},{"cm":27.9,"in":10.9842,"us":"12","uk":"9.5","eu":"44.5"},{"cm":28.3,"in":11.1417,"us":"12.5","uk":"10","eu":"45"},{"cm":28.8,"in":11.3386,"us":"13","uk":"10.5","eu":"45.5"},{"cm":29.2,"in":11.496,"us":"13.5","uk":"11","eu":"46"},{"cm":29.6,"in":11.6535,"us":"14","uk":"11.5","eu":"47"},{"cm":30.0,"in":11.811,"us":"14.5","uk":"12","eu":"47.5"},{"cm":30.5,"in":12.0078,"us":"15","uk":"12.5","eu":"48"},{"cm":30.9,"in":12.1653,"us":"15.5","uk":"13","eu":"48.5"},{"cm":31.3,"in":12.3228,"us":"16","uk":"13.5","eu":"49"},{"cm":31.7,"in":12.4803,"us":"16.5","uk":"14","eu":"50"},{"cm":32.2,"in":12.6771,"us":"17","uk":"14.5","eu":"50.5"}]}},"On Running":{"men":{"notes":"On Running uses JP measurements as their shoe size. Per On's own guidance: foot length = JP minus 1 cm (measure your foot barefoot against a wall, add about 1 cm for your shoe size). On runs slightly roomier than Nike/Asics.","rows":[{"cm":24.0,"in":9.4488,"us":"7","uk":"6.5","eu":"40"},{"cm":24.5,"in":9.6456,"us":"7.5","uk":"7","eu":"40.5"},{"cm":25.0,"in":9.8425,"us":"8","uk":"7.5","eu":"41"},{"cm":25.5,"in":10.0394,"us":"8.5","uk":"8","eu":"42"},{"cm":26.0,"in":10.2362,"us":"9","uk":"8.5","eu":"42.5"},{"cm":26.5,"in":10.433,"us":"9.5","uk":"9","eu":"43"},{"cm":27.0,"in":10.6299,"us":"10","uk":"9.5","eu":"44"},{"cm":27.5,"in":10.8268,"us":"10.5","uk":"10","eu":"44.5"},{"cm":28.0,"in":11.0236,"us":"11","uk":"10.5","eu":"45"},{"cm":28.5,"in":11.2204,"us":"11.5","uk":"11","eu":"46"},{"cm":29.0,"in":11.4173,"us":"12","uk":"11.5","eu":"47"},{"cm":29.5,"in":11.6142,"us":"12.5","uk":"12","eu":"47.5"},{"cm":30.0,"in":11.811,"us":"13","uk":"12.5","eu":"48"},{"cm":30.5,"in":12.0078,"us":"13.5","uk":"13","eu":"48.5"},{"cm":30.5,"in":12.0078,"us":"14","uk":"13.5","eu":"49"},{"cm":32.0,"in":12.5984,"us":"15","uk":"14.5","eu":"50"}]},"women":{"notes":"On Running uses JP measurements as their shoe size. Per On's own guidance: foot length = JP minus 1 cm (measure your foot barefoot against a wall, add about 1 cm for your shoe size). On runs slightly roomier than Nike/Asics.","rows":[{"cm":21.0,"in":8.2677,"us":"5","uk":"3","eu":"36"},{"cm":21.5,"in":8.4645,"us":"5.5","uk":"3.5","eu":"36.5"},{"cm":22.0,"in":8.6614,"us":"6","uk":"4","eu":"37"},{"cm":22.5,"in":8.8582,"us":"6.5","uk":"4.5","eu":"37.5"},{"cm":23.0,"in":9.0551,"us":"7","uk":"5","eu":"38"},{"cm":23.5,"in":9.2519,"us":"7.5","uk":"5.5","eu":"38.5"},{"cm":24.0,"in":9.4488,"us":"8","uk":"6","eu":"39"},{"cm":24.5,"in":9.6456,"us":"8.5","uk":"6.5","eu":"40"},{"cm":25.0,"in":9.8425,"us":"9","uk":"7","eu":"40.5"},{"cm":25.5,"in":10.0394,"us":"9.5","uk":"7.5","eu":"41"},{"cm":26.0,"in":10.2362,"us":"10","uk":"8","eu":"42"},{"cm":26.5,"in":10.433,"us":"10.5","uk":"8.5","eu":"42.5"},{"cm":27.0,"in":10.6299,"us":"11","uk":"9","eu":"43"},{"cm":28.0,"in":11.0236,"us":"12","uk":"10","eu":"44"}]}},"Puma":{"men":{"notes":"Puma runs slightly roomier than Nike/Asics - when in doubt, go up half a size (Puma's own recommendation). Unisex models follow men's sizing; women should subtract 1.5 US sizes.","rows":[{"cm":24.0,"in":9.4,"us":"6","uk":"5","eu":"38"},{"cm":24.5,"in":9.6,"us":"6.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8,"us":"7","uk":"6","eu":"39"},{"cm":25.5,"in":10.0,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.5,"in":10.4,"us":"8.5","uk":"7","eu":"41"},{"cm":27.0,"in":10.6,"us":"9","uk":"8","eu":"42"},{"cm":27.5,"in":10.8,"us":"9.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0,"us":"10","uk":"9","eu":"43"},{"cm":28.5,"in":11.2,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.8,"us":"12","uk":"11","eu":"46"},{"cm":30.5,"in":12.0,"us":"12.5","uk":"11.5","eu":"46.5"},{"cm":31.0,"in":12.2,"us":"13","uk":"12","eu":"47"}]},"unisex":{"notes":"Puma runs slightly roomier than Nike/Asics - when in doubt, go up half a size (Puma's own recommendation). Unisex models follow men's sizing; women should subtract 1.5 US sizes.","rows":[{"cm":24.0,"in":9.4,"us":"6","uk":"5","eu":"38"},{"cm":24.5,"in":9.6,"us":"6.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8,"us":"7","uk":"6","eu":"39"},{"cm":25.5,"in":10.0,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.5,"in":10.4,"us":"8.5","uk":"7","eu":"41"},{"cm":27.0,"in":10.6,"us":"9","uk":"8","eu":"42"},{"cm":27.5,"in":10.8,"us":"9.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0,"us":"10","uk":"9","eu":"43"},{"cm":28.5,"in":11.2,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.8,"us":"12","uk":"11","eu":"46"},{"cm":31.0,"in":12.2,"us":"13","uk":"12","eu":"47"},{"cm":33.0,"in":13.0,"us":"15","uk":"14","eu":"49.5"},{"cm":34.0,"in":13.4,"us":"16","uk":"15","eu":"51"}]},"women":{"notes":"Puma runs slightly roomier than Nike/Asics - when in doubt, go up half a size (Puma's own recommendation). Unisex models follow men's sizing; women should subtract 1.5 US sizes.","rows":[{"cm":22.0,"in":8.7,"us":"5.5","uk":"3","eu":"35.5"},{"cm":22.5,"in":8.9,"us":"6","uk":"3.5","eu":"36"},{"cm":23.0,"in":9.1,"us":"7","uk":"4","eu":"37"},{"cm":23.5,"in":9.3,"us":"7.5","uk":"4.5","eu":"37.5"},{"cm":24.0,"in":9.4,"us":"8","uk":"5","eu":"38"},{"cm":24.5,"in":9.6,"us":"8.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8,"us":"9","uk":"6","eu":"39"},{"cm":25.5,"in":10.0,"us":"9.5","uk":"6","eu":"40"},{"cm":26.5,"in":10.4,"us":"10","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6,"us":"10.5","uk":"8","eu":"42"},{"cm":27.5,"in":10.8,"us":"11","uk":"8.5","eu":"42.5"}]}},"Reebok":{"men":{"notes":"Reebok was previously owned by Adidas but uses its own sizing - which differs notably from Adidas at the same foot length. Unisex models follow men's sizing - women subtract 1.5 US sizes from their usual size.","rows":[{"cm":24.5,"in":9.6456,"us":"6.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8425,"us":"7","uk":"6","eu":"39"},{"cm":25.5,"in":10.0394,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8","eu":"42"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"43"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.811,"us":"12","uk":"11","eu":"45.5"},{"cm":30.5,"in":12.0078,"us":"12.5","uk":"11.5","eu":"46"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12","eu":"47"},{"cm":31.5,"in":12.4016,"us":"13.5","uk":"12.5","eu":"48"},{"cm":32.0,"in":12.5984,"us":"14","uk":"13","eu":"48.5"},{"cm":32.5,"in":12.7952,"us":"14.5","uk":"13.5","eu":"49"},{"cm":33.0,"in":12.9921,"us":"15","uk":"14","eu":"50"}]},"unisex":{"notes":"Reebok was previously owned by Adidas but uses its own sizing - which differs notably from Adidas at the same foot length. Unisex models follow men's sizing - women subtract 1.5 US sizes from their usual size.","rows":[{"cm":24.5,"in":9.6456,"us":"6.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8425,"us":"7","uk":"6","eu":"39"},{"cm":25.5,"in":10.0394,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8","eu":"42"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"43"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.811,"us":"12","uk":"11","eu":"45.5"},{"cm":30.5,"in":12.0078,"us":"12.5","uk":"11.5","eu":"46"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12","eu":"47"},{"cm":31.5,"in":12.4016,"us":"13.5","uk":"12.5","eu":"48"},{"cm":32.0,"in":12.5984,"us":"14","uk":"13","eu":"48.5"},{"cm":32.5,"in":12.7952,"us":"14.5","uk":"13.5","eu":"49"},{"cm":33.0,"in":12.9921,"us":"15","uk":"14","eu":"50"}]},"women":{"notes":"Reebok was previously owned by Adidas but uses its own sizing - which differs notably from Adidas at the same foot length. Unisex models follow men's sizing - women subtract 1.5 US sizes from their usual size.","rows":[{"cm":22.0,"in":8.6614,"us":"5","uk":"2.5","eu":"35"},{"cm":22.5,"in":8.8582,"us":"5.5","uk":"3","eu":"35.5"},{"cm":23.0,"in":9.0551,"us":"6","uk":"3.5","eu":"36"},{"cm":23.5,"in":9.2519,"us":"6.5","uk":"4","eu":"37"},{"cm":24.0,"in":9.4488,"us":"7","uk":"4.5","eu":"37.5"},{"cm":24.5,"in":9.6456,"us":"7.5","uk":"5","eu":"38"},{"cm":25.0,"in":9.8425,"us":"8","uk":"5.5","eu":"38.5"},{"cm":25.5,"in":10.0394,"us":"8.5","uk":"6","eu":"39"},{"cm":26.0,"in":10.2362,"us":"9","uk":"6.5","eu":"40"},{"cm":26.5,"in":10.433,"us":"9.5","uk":"7","eu":"40.5"},{"cm":27.0,"in":10.6299,"us":"10","uk":"7.5","eu":"41"},{"cm":27.5,"in":10.8268,"us":"10.5","uk":"8","eu":"42"},{"cm":28.0,"in":11.0236,"us":"11","uk":"8.5","eu":"42.5"},{"cm":28.5,"in":11.2204,"us":"11.5","uk":"9","eu":"43"},{"cm":29.0,"in":11.4173,"us":"12","uk":"9.5","eu":"44"}]}},"Salomon":{"men":{"notes":"Salomon is an outdoor/trail specialist. For mountain weather or trail running with thick socks, Salomon recommends going up half a size. Wide fit models (X-ULTRA WIDE, SPEEDCROSS WIDE) have about 12mm extra forefoot room.","rows":[{"cm":24.5,"in":9.6456,"us":"7","uk":"6.5","eu":"40"},{"cm":25.0,"in":9.8425,"us":"7.5","uk":"7","eu":"40 2/3"},{"cm":25.5,"in":10.0394,"us":"8","uk":"7.5","eu":"41 1/3"},{"cm":26.0,"in":10.2362,"us":"8.5","uk":"8","eu":"42"},{"cm":26.5,"in":10.433,"us":"9","uk":"8.5","eu":"42 2/3"},{"cm":27.0,"in":10.6299,"us":"9.5","uk":"9","eu":"43 1/3"},{"cm":27.5,"in":10.8268,"us":"10","uk":"9.5","eu":"44"},{"cm":28.0,"in":11.0236,"us":"10.5","uk":"10","eu":"44 2/3"},{"cm":28.5,"in":11.2204,"us":"11","uk":"10.5","eu":"45 1/3"},{"cm":29.0,"in":11.4173,"us":"11.5","uk":"11","eu":"46"},{"cm":29.5,"in":11.6142,"us":"12","uk":"11.5","eu":"46 2/3"},{"cm":30.0,"in":11.811,"us":"12.5","uk":"12","eu":"47 1/3"},{"cm":30.5,"in":12.0078,"us":"13","uk":"12.5","eu":"48"},{"cm":31.0,"in":12.2047,"us":"13.5","uk":"13","eu":"48 2/3"},{"cm":31.5,"in":12.4016,"us":"14","uk":"13.5","eu":"49 1/3"}]},"women":{"notes":"Salomon is an outdoor/trail specialist. For mountain weather or trail running with thick socks, Salomon recommends going up half a size. Wide fit models (X-ULTRA WIDE, SPEEDCROSS WIDE) have about 12mm extra forefoot room.","rows":[{"cm":21.5,"in":8.4645,"us":"5","uk":"3.5","eu":"36"},{"cm":22.0,"in":8.6614,"us":"5.5","uk":"4","eu":"36 2/3"},{"cm":22.5,"in":8.8582,"us":"6","uk":"4.5","eu":"37 1/3"},{"cm":23.0,"in":9.0551,"us":"6.5","uk":"5","eu":"38"},{"cm":23.5,"in":9.2519,"us":"7","uk":"5.5","eu":"38 2/3"},{"cm":24.0,"in":9.4488,"us":"7.5","uk":"6","eu":"39 1/3"},{"cm":24.5,"in":9.6456,"us":"8","uk":"6.5","eu":"40"},{"cm":25.0,"in":9.8425,"us":"8.5","uk":"7","eu":"40 2/3"},{"cm":25.5,"in":10.0394,"us":"9","uk":"7.5","eu":"41 1/3"},{"cm":26.0,"in":10.2362,"us":"9.5","uk":"8","eu":"42"},{"cm":26.5,"in":10.433,"us":"10","uk":"8.5","eu":"42 2/3"},{"cm":27.0,"in":10.6299,"us":"10.5","uk":"9","eu":"43 1/3"},{"cm":27.5,"in":10.8268,"us":"11","uk":"9.5","eu":"44"},{"cm":28.0,"in":11.0236,"us":"11.5","uk":"10","eu":"44 2/3"},{"cm":28.5,"in":11.2204,"us":"12","uk":"10.5","eu":"45 1/3"},{"cm":29.0,"in":11.4173,"us":"12.5","uk":"11","eu":"46"},{"cm":29.5,"in":11.6142,"us":"13","uk":"11.5","eu":"46 2/3"},{"cm":30.0,"in":11.811,"us":"13.5","uk":"12","eu":"47 1/3"},{"cm":30.5,"in":12.0078,"us":"14","uk":"12.5","eu":"48"},{"cm":31.0,"in":12.2047,"us":"14.5","uk":"13","eu":"48 2/3"},{"cm":31.5,"in":12.4016,"us":"15","uk":"13.5","eu":"49 1/3"},{"cm":32.0,"in":12.5984,"us":"15.5","uk":"14","eu":"50"},{"cm":32.5,"in":12.7952,"us":"16","uk":"14.5","eu":"50 2/3"}]}},"Saucony":{"men":{"notes":"Saucony runs true-to-size for running shoes. For narrow feet, consider going down half a size.","rows":[{"cm":22.5,"in":8.8582,"us":"4.5","uk":"3.5","eu":"37"},{"cm":23.0,"in":9.0551,"us":"5","uk":"4","eu":"37.5"},{"cm":23.5,"in":9.2519,"us":"5.5","uk":"4.5","eu":"38"},{"cm":24.0,"in":9.4488,"us":"6","uk":"5","eu":"38.5"},{"cm":24.5,"in":9.6456,"us":"6.5","uk":"5.5","eu":"39"},{"cm":25.0,"in":9.8425,"us":"7","uk":"6","eu":"40"},{"cm":25.5,"in":10.0394,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7","eu":"41"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"7.5","eu":"42"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"43"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"44"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10","eu":"45"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"10.5","eu":"46"},{"cm":30.0,"in":11.811,"us":"12","uk":"11","eu":"46.5"},{"cm":30.5,"in":12.0078,"us":"12.5","uk":"11.5","eu":"47"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12","eu":"48"}]},"women":{"notes":"Saucony runs true-to-size for running shoes. For narrow feet, consider going down half a size.","rows":[{"cm":21.5,"in":8.4645,"us":"5","uk":"3","eu":"35.5"},{"cm":22.0,"in":8.6614,"us":"5.5","uk":"3.5","eu":"36"},{"cm":22.5,"in":8.8582,"us":"6","uk":"4","eu":"37"},{"cm":23.0,"in":9.0551,"us":"6.5","uk":"4.5","eu":"37.5"},{"cm":23.5,"in":9.2519,"us":"7","uk":"5","eu":"38"},{"cm":24.0,"in":9.4488,"us":"7.5","uk":"5.5","eu":"38.5"},{"cm":24.5,"in":9.6456,"us":"8","uk":"6","eu":"39"},{"cm":25.0,"in":9.8425,"us":"8.5","uk":"6.5","eu":"40"},{"cm":25.5,"in":10.0394,"us":"9","uk":"7","eu":"40.5"},{"cm":26.0,"in":10.2362,"us":"9.5","uk":"7.5","eu":"41"},{"cm":26.5,"in":10.433,"us":"10","uk":"8","eu":"42"},{"cm":27.0,"in":10.6299,"us":"10.5","uk":"8.5","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"11","uk":"9","eu":"43"}]}},"Skechers":{"men":{"notes":"Skechers runs true-to-size with a spacious comfortable toebox. Wide fit models (marked EWW = Extra Wide Width) have extra room. Available in 5 width fittings: Medium (D men / B women), Wide (2E men / D women), Extra Wide (4E men), Relaxed Fit (E men / C women), Extra Wide Fit.","rows":[{"cm":24.5,"in":9.6456,"us":"6.5","uk":"5.5","eu":"39"},{"cm":25.0,"in":9.8425,"us":"7","uk":"6","eu":"39.5"},{"cm":25.5,"in":10.0394,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2362,"us":"8","uk":"7","eu":"41"},{"cm":26.5,"in":10.433,"us":"8.5","uk":"7.5","eu":"42"},{"cm":27.0,"in":10.6299,"us":"9","uk":"8","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"43"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"43.5"},{"cm":28.5,"in":11.2204,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.811,"us":"12","uk":"11","eu":"45.5"},{"cm":30.5,"in":12.0078,"us":"12.5","uk":"11","eu":"46"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12","eu":"47"},{"cm":32.0,"in":12.5984,"us":"14","uk":"13","eu":"48"},{"cm":33.0,"in":12.9921,"us":"15","uk":"14","eu":"49"},{"cm":34.0,"in":13.3858,"us":"16","uk":"15","eu":"50"},{"cm":35.0,"in":13.7795,"us":"17","uk":"16","eu":"51"}]},"women":{"notes":"Skechers runs true-to-size with a spacious comfortable toebox. Wide fit models (marked EWW = Extra Wide Width) have extra room. Available in 5 width fittings: Medium (D men / B women), Wide (2E men / D women), Extra Wide (4E men), Relaxed Fit (E men / C women), Extra Wide Fit.","rows":[{"cm":22.0,"in":8.6614,"us":"5","uk":"2","eu":"35"},{"cm":22.5,"in":8.8582,"us":"5.5","uk":"2.5","eu":"35.5"},{"cm":23.0,"in":9.0551,"us":"6","uk":"3","eu":"36"},{"cm":23.5,"in":9.2519,"us":"6.5","uk":"3.5","eu":"36.5"},{"cm":24.0,"in":9.4488,"us":"7","uk":"4","eu":"37"},{"cm":24.5,"in":9.6456,"us":"7.5","uk":"4.5","eu":"37.5"},{"cm":25.0,"in":9.8425,"us":"8","uk":"5","eu":"38"},{"cm":25.5,"in":10.0394,"us":"8.5","uk":"5.5","eu":"38.5"},{"cm":26.0,"in":10.2362,"us":"9","uk":"6","eu":"39"},{"cm":26.5,"in":10.433,"us":"9.5","uk":"6.5","eu":"39.5"},{"cm":27.0,"in":10.6299,"us":"10","uk":"7","eu":"40"},{"cm":27.5,"in":10.8268,"us":"10.5","uk":"7.5","eu":"40.5"},{"cm":28.0,"in":11.0236,"us":"11","uk":"8","eu":"41"},{"cm":29.0,"in":11.4173,"us":"12","uk":"9","eu":"42"},{"cm":30.0,"in":11.811,"us":"13","uk":"10","eu":"43"}]}},"Under Armour":{"men":{"notes":"Under Armour uses unisex sizing for many models. UA runs slightly on the narrow side - for performance running models consider going up half a size. Wide-fit (4E) available for broader foot volume.","rows":[{"cm":25.0,"in":9.6875,"us":"7","uk":"6","eu":"40"},{"cm":25.5,"in":9.75,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":26.0,"in":9.9375,"us":"8","uk":"7","eu":"41"},{"cm":26.5,"in":10.0625,"us":"8.5","uk":"7.5","eu":"42"},{"cm":27.0,"in":10.25,"us":"9","uk":"8","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"43"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"44"},{"cm":28.5,"in":10.75,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10","eu":"45"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"10.5","eu":"45.5"},{"cm":30.0,"in":11.25,"us":"12","uk":"11","eu":"46"},{"cm":30.5,"in":11.5,"us":"12.5","uk":"11.5","eu":"47"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12","eu":"47.5"},{"cm":31.5,"in":11.75,"us":"13.5","uk":"12.5","eu":"48"},{"cm":32.0,"in":12.0,"us":"14","uk":"13","eu":"48.5"},{"cm":32.5,"in":12.7952,"us":"14.5","uk":"13.5","eu":"49"},{"cm":33.0,"in":12.25,"us":"15","uk":"14","eu":"49.5"},{"cm":33.5,"in":13.125,"us":"15.5","uk":"14.5","eu":"50"},{"cm":34.0,"in":13.25,"us":"16","uk":"15","eu":"50.5"}]},"unisex":{"notes":"Under Armour uses unisex sizing for many models. UA runs slightly on the narrow side - for performance running models consider going up half a size. Wide-fit (4E) available for broader foot volume.","rows":[{"cm":22.5,"in":8.5,"us":"3.5","uk":"3","eu":"35.5"},{"cm":23.0,"in":8.8125,"us":"4","uk":"3.5","eu":"36"},{"cm":23.5,"in":8.9375,"us":"4.5","uk":"4","eu":"36.5"},{"cm":24.0,"in":9.25,"us":"5.5","uk":"5","eu":"38"},{"cm":24.5,"in":9.5,"us":"6.5","uk":"6","eu":"39"},{"cm":25.0,"in":9.6875,"us":"7","uk":"6","eu":"40"},{"cm":25.5,"in":9.75,"us":"7.5","uk":"6.5","eu":"40.5"},{"cm":26.0,"in":9.9375,"us":"8","uk":"7","eu":"41"},{"cm":26.5,"in":10.0625,"us":"8.5","uk":"7.5","eu":"42"},{"cm":27.0,"in":10.25,"us":"9","uk":"8","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"9.5","uk":"8.5","eu":"43"},{"cm":28.0,"in":11.0236,"us":"10","uk":"9","eu":"44"},{"cm":28.5,"in":10.75,"us":"10.5","uk":"9.5","eu":"44.5"},{"cm":29.0,"in":11.4173,"us":"11","uk":"10","eu":"45"},{"cm":29.5,"in":11.6142,"us":"11.5","uk":"10.5","eu":"45.5"},{"cm":30.0,"in":11.25,"us":"12","uk":"11","eu":"46"},{"cm":30.5,"in":11.5,"us":"12.5","uk":"11.5","eu":"47"},{"cm":31.0,"in":12.2047,"us":"13","uk":"12","eu":"47.5"},{"cm":31.5,"in":11.75,"us":"13.5","uk":"12.5","eu":"48"},{"cm":32.0,"in":12.0,"us":"14","uk":"13","eu":"48.5"},{"cm":32.5,"in":12.7952,"us":"14.5","uk":"13.5","eu":"49"},{"cm":33.0,"in":12.25,"us":"15","uk":"14","eu":"49.5"}]},"women":{"notes":"Under Armour uses unisex sizing for many models. UA runs slightly on the narrow side - for performance running models consider going up half a size. Wide-fit (4E) available for broader foot volume.","rows":[{"cm":22.5,"in":8.5,"us":"5","uk":"3","eu":"35.5"},{"cm":23.0,"in":8.8125,"us":"5.5","uk":"3.5","eu":"36"},{"cm":23.5,"in":8.9375,"us":"6","uk":"4","eu":"36.5"},{"cm":24.0,"in":9.25,"us":"7","uk":"5","eu":"38"},{"cm":24.5,"in":9.5,"us":"8","uk":"6","eu":"39"},{"cm":25.0,"in":9.6875,"us":"8.5","uk":"6","eu":"40"},{"cm":25.5,"in":9.75,"us":"9","uk":"6.5","eu":"40.5"},{"cm":26.0,"in":9.9375,"us":"9.5","uk":"7","eu":"41"},{"cm":26.5,"in":10.0625,"us":"10","uk":"7.5","eu":"42"},{"cm":27.0,"in":10.25,"us":"10.5","uk":"8","eu":"42.5"},{"cm":27.5,"in":10.8268,"us":"11","uk":"8.5","eu":"43"},{"cm":28.0,"in":11.0236,"us":"11.5","uk":"9","eu":"44"},{"cm":28.5,"in":10.75,"us":"12","uk":"9.5","eu":"44.5"},{"cm":29.0,"in":11.4173,"us":"12.5","uk":"10","eu":"45"},{"cm":29.5,"in":11.6142,"us":"13","uk":"10.5","eu":"45.5"},{"cm":30.0,"in":11.25,"us":"13.5","uk":"11","eu":"46"},{"cm":30.5,"in":11.5,"us":"14","uk":"11.5","eu":"47"},{"cm":31.0,"in":12.2047,"us":"14.5","uk":"12","eu":"47.5"},{"cm":31.5,"in":11.75,"us":"15","uk":"12.5","eu":"48"},{"cm":32.0,"in":12.0,"us":"15.5","uk":"13","eu":"48.5"},{"cm":32.5,"in":12.7952,"us":"16","uk":"13.5","eu":"49"},{"cm":33.0,"in":12.25,"us":"16.5","uk":"14","eu":"49.5"}]}},"Vans":{"men":{"notes":"Vans uses unisex sizing. Performance models like Old Skool and Sk8-Hi run slightly tight - consider going up half a size. Classic Slip-On stretches a bit with wear.","rows":[{"cm":24.5,"in":9.6,"us":"6.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8,"us":"7","uk":"6","eu":"39"},{"cm":25.5,"in":10.0,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2,"us":"8","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.4,"us":"8.5","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6,"us":"9","uk":"8","eu":"42"},{"cm":27.5,"in":10.8,"us":"9.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0,"us":"10","uk":"9","eu":"43"},{"cm":28.5,"in":11.2,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.8,"us":"12","uk":"11","eu":"46"},{"cm":31.0,"in":12.2,"us":"13","uk":"12","eu":"47"},{"cm":32.0,"in":12.6,"us":"14","uk":"13","eu":"48"},{"cm":33.0,"in":13.0,"us":"15","uk":"14","eu":"49"},{"cm":34.0,"in":13.4,"us":"16","uk":"15","eu":"50"}]},"unisex":{"notes":"Vans uses unisex sizing. Performance models like Old Skool and Sk8-Hi run slightly tight - consider going up half a size. Classic Slip-On stretches a bit with wear.","rows":[{"cm":24.5,"in":9.6,"us":"6.5","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8,"us":"7","uk":"6","eu":"39"},{"cm":25.5,"in":10.0,"us":"7.5","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2,"us":"8","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.4,"us":"8.5","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6,"us":"9","uk":"8","eu":"42"},{"cm":27.5,"in":10.8,"us":"9.5","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0,"us":"10","uk":"9","eu":"43"},{"cm":28.5,"in":11.2,"us":"10.5","uk":"9.5","eu":"44"},{"cm":29.0,"in":11.4,"us":"11","uk":"10","eu":"44.5"},{"cm":29.5,"in":11.6,"us":"11.5","uk":"10.5","eu":"45"},{"cm":30.0,"in":11.8,"us":"12","uk":"11","eu":"46"},{"cm":31.0,"in":12.2,"us":"13","uk":"12","eu":"47"},{"cm":32.0,"in":12.6,"us":"14","uk":"13","eu":"48"},{"cm":33.0,"in":13.0,"us":"15","uk":"14","eu":"49"},{"cm":34.0,"in":13.4,"us":"16","uk":"15","eu":"50"}]},"women":{"notes":"Vans uses unisex sizing. Performance models like Old Skool and Sk8-Hi run slightly tight - consider going up half a size. Classic Slip-On stretches a bit with wear.","rows":[{"cm":21.5,"in":8.5,"us":"5","uk":"2.5","eu":"34.5"},{"cm":22.0,"in":8.7,"us":"5.5","uk":"3","eu":"35"},{"cm":22.5,"in":8.9,"us":"6","uk":"3.5","eu":"36"},{"cm":23.0,"in":9.1,"us":"6.5","uk":"4","eu":"36.5"},{"cm":23.5,"in":9.3,"us":"7","uk":"4.5","eu":"37"},{"cm":24.0,"in":9.4,"us":"7.5","uk":"5","eu":"38"},{"cm":24.5,"in":9.6,"us":"8","uk":"5.5","eu":"38.5"},{"cm":25.0,"in":9.8,"us":"8.5","uk":"6","eu":"39"},{"cm":25.5,"in":10.0,"us":"9","uk":"6.5","eu":"40"},{"cm":26.0,"in":10.2,"us":"9.5","uk":"7","eu":"40.5"},{"cm":26.5,"in":10.4,"us":"10","uk":"7.5","eu":"41"},{"cm":27.0,"in":10.6,"us":"10.5","uk":"8","eu":"42"},{"cm":27.5,"in":10.8,"us":"11","uk":"8.5","eu":"42.5"},{"cm":28.0,"in":11.0,"us":"11.5","uk":"9","eu":"43"}]}}};
+
+        // ===== HELPERS =====
+        function formatLength(cm, inch, unit) {
+            const num = unit === 'in' ? parseFloat(inch) : parseFloat(cm);
+            const hundredths = Math.round(num * 100);
+            const suffix = unit === 'in' ? '"' : ' cm';
+            if (hundredths % 100 === 0) return (hundredths / 100) + suffix;
+            if (hundredths % 10 === 0)  return (hundredths / 100).toFixed(1) + suffix;
+            return (hundredths / 100).toFixed(2) + suffix;
+        }
+
+        function genderLabel(g) {
+            return ({men: "Men's Size", women: "Women's Size", unisex: "Unisex Size"})[g] || '';
+        }
+
+        function zapposSearchUrl(brand, gender, us_size) {
+            const parts = [brand.toLowerCase()];
+            if (gender === 'men') parts.push('men');
+            if (gender === 'women') parts.push('women');
+            parts.push('size', us_size);
+            return 'https://www.zappos.com/search?term=' + encodeURIComponent(parts.join(' '));
+        }
+
+        function amazonSearchUrl(brand, gender, us_size) {
+            // Amazon Fashion shoes category - gender-specifiek
+            // Heren + Unisex -> fashion-mens-shoes, Dames -> fashion-womens-shoes
+            const category = gender === 'women' ? 'fashion-womens-shoes' : 'fashion-mens-shoes';
+            const keywords = brand.toLowerCase() + ' size ' + us_size;
+            return 'https://www.amazon.com/s?k=' + encodeURIComponent(keywords) + '&i=' + category;
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        // ===== STATE =====
+        let currentUnit = 'in';
+
+        // ===== DOM =====
+        const brandSelect = document.getElementById('brand');
+        const genderInputs = document.querySelectorAll('input[name="gender"]');
+        const lengthSelect = document.getElementById('length-select');
+        const unitInBtn = document.getElementById('unit-in');
+        const unitCmBtn = document.getElementById('unit-cm');
+        const findBtn = document.getElementById('find-btn');
+        const resultArea = document.getElementById('result-area');
+
+        // ===== INIT =====
+        function init() {
+            // Vul brand-dropdown
+            const brands = Object.keys(DATA).sort();
+            brands.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b;
+                opt.textContent = b;
+                brandSelect.appendChild(opt);
+            });
+        }
+
+        function updateGenderAvailability(brand) {
+            if (!brand || !DATA[brand]) {
+                genderInputs.forEach(g => g.disabled = false);
+                return;
+            }
+            const hasUnisex = DATA[brand]['unisex'] && DATA[brand]['unisex'].rows.length > 0;
+            genderInputs.forEach(g => {
+                const hasData = DATA[brand][g.value] && DATA[brand][g.value].rows.length > 0;
+                g.disabled = !(hasData || hasUnisex);
+                // Als de huidige selectie nu disabled is, uncheck 'm
+                if (g.checked && g.disabled) g.checked = false;
+            });
+        }
+
+        function refreshLengthDropdown() {
+            const brand = brandSelect.value;
+            const genderRadio = document.querySelector('input[name="gender"]:checked');
+            const gender = genderRadio ? genderRadio.value : '';
+
+            lengthSelect.innerHTML = '';
+
+            if (!brand) {
+                lengthSelect.disabled = true;
+                lengthSelect.innerHTML = '<option value="" disabled selected>Choose a brand first...</option>';
+                return;
+            }
+            if (!gender) {
+                lengthSelect.disabled = true;
+                lengthSelect.innerHTML = '<option value="" disabled selected>Choose a gender...</option>';
+                return;
+            }
+
+            // Probeer het gekozen gender, anders unisex fallback
+            let entries = (DATA[brand] && DATA[brand][gender] && DATA[brand][gender].rows) || [];
+            let fallbackUsed = false;
+            if (entries.length === 0 && DATA[brand] && DATA[brand]['unisex']) {
+                entries = DATA[brand]['unisex'].rows;
+                fallbackUsed = true;
+            }
+
+            if (entries.length === 0) {
+                lengthSelect.disabled = true;
+                lengthSelect.innerHTML = '<option value="" disabled selected>No data for this combination</option>';
+                return;
+            }
+
+            entries = [...entries].sort((a, b) => a.cm - b.cm);
+            lengthSelect.disabled = false;
+
+            const placeholderText = fallbackUsed ? 'Choose foot length (unisex sizes)...' : 'Choose foot length...';
+            const placeholderOpt = document.createElement('option');
+            placeholderOpt.value = '';
+            placeholderOpt.disabled = true;
+            placeholderOpt.selected = true;
+            placeholderOpt.textContent = placeholderText;
+            lengthSelect.appendChild(placeholderOpt);
+
+            entries.forEach(entry => {
+                const opt = document.createElement('option');
+                opt.value = entry.cm;
+                opt.textContent = formatLength(entry.cm, entry.in, currentUnit);
+                lengthSelect.appendChild(opt);
+            });
+        }
+
+        function setUnit(unit) {
+            currentUnit = unit;
+            unitInBtn.classList.toggle('active', unit === 'in');
+            unitCmBtn.classList.toggle('active', unit === 'cm');
+            unitInBtn.setAttribute('aria-pressed', unit === 'in' ? 'true' : 'false');
+            unitCmBtn.setAttribute('aria-pressed', unit === 'cm' ? 'true' : 'false');
+            refreshLengthDropdown();
+        }
+
+        function findMatch() {
+            const brand = brandSelect.value;
+            const genderRadio = document.querySelector('input[name="gender"]:checked');
+            const gender = genderRadio ? genderRadio.value : '';
+            const cmValue = parseFloat(lengthSelect.value);
+
+            if (!brand || !gender || isNaN(cmValue)) {
+                resultArea.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Please complete all fields</div><div class="empty-text">Select a brand, gender, and foot length to continue.</div></div>';
+                return;
+            }
+
+            // Zoek dichtstbijzijnde rij — eerst gekozen gender, fallback naar unisex
+            let usedGender = gender;
+            let entries = (DATA[brand] && DATA[brand][gender] && DATA[brand][gender].rows) || [];
+            let fallbackUsed = false;
+            if (entries.length === 0 && DATA[brand] && DATA[brand]['unisex']) {
+                entries = DATA[brand]['unisex'].rows;
+                usedGender = 'unisex';
+                fallbackUsed = true;
+            }
+
+            if (entries.length === 0) {
+                resultArea.innerHTML = '<div class="empty-state"><div class="empty-icon">😕</div><div class="empty-title">No match found</div><div class="empty-text">No data for ' + escapeHtml(brand) + ' at this foot length</div></div>';
+                return;
+            }
+
+            // Closest match
+            const best = entries.reduce((closest, e) =>
+                Math.abs(e.cm - cmValue) < Math.abs(closest.cm - cmValue) ? e : closest
+            );
+            const notes = DATA[brand][usedGender].notes;
+            renderResult(brand, usedGender, best, notes, fallbackUsed);
+        }
+
+        function renderResult(brand, gender, row, notes, fallbackUsed) {
+            const displayLength = formatLength(row.cm, row.in, currentUnit);
+            const shopUrl = zapposSearchUrl(brand, gender, row.us);
+
+            let html = '<div class="result-card">';
+            html += '<div class="result-brand">' + escapeHtml(brand) + '</div>';
+            html += '<div class="result-foot">for foot length ' + escapeHtml(displayLength) + '</div>';
+            html += '<div class="result-size">' + escapeHtml(row.us) + '</div>';
+            html += '<div class="result-size-label">' + genderLabel(gender) + ' (US)</div>';
+            html += '<div class="result-detail">';
+            html += '<div class="result-item"><div class="result-item-label">UK</div><div class="result-item-value">' + escapeHtml(row.uk) + '</div></div>';
+            html += '<div class="result-item"><div class="result-item-label">EU</div><div class="result-item-value">' + escapeHtml(row.eu) + '</div></div>';
+            html += '<div class="result-item"><div class="result-item-label">' + (currentUnit === 'in' ? 'INCHES' : 'CM') + '</div><div class="result-item-value">' + escapeHtml(displayLength) + '</div></div>';
+            html += '</div>';
+            if (fallbackUsed) {
+                html += '<div class="fallback-banner">ℹ️ <strong>' + escapeHtml(brand) + ' uses unisex sizing</strong> — the same scale for men and women. This is the official ' + escapeHtml(brand) + ' size for your foot length.</div>';
+            }
+            if (notes) {
+                html += '<div class="result-notes">ℹ️ ' + escapeHtml(notes) + '</div>';
+            }
+            const amazonUrl = amazonSearchUrl(brand, gender, row.us);
+            html += '<div class="shop-row">';
+            html += '<a href="' + escapeHtml(amazonUrl) + '" class="btn-shop" target="_blank" rel="noopener noreferrer">Shop at Amazon <span class="arrow">→</span></a>';
+            html += '<a href="' + escapeHtml(shopUrl) + '" class="btn-shop" target="_blank" rel="noopener noreferrer">Shop at Zappos <span class="arrow">→</span></a>';
+            html += '</div>';
+            html += '</div>';
+
+            resultArea.innerHTML = html;
+            // Scroll naar resultaat (op mobile handig)
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ===== EVENT LISTENERS =====
+        brandSelect.addEventListener('change', () => {
+            updateGenderAvailability(brandSelect.value);
+            refreshLengthDropdown();
+        });
+        genderInputs.forEach(input => {
+            input.addEventListener('change', refreshLengthDropdown);
+        });
+        unitInBtn.addEventListener('click', () => setUnit('in'));
+        unitCmBtn.addEventListener('click', () => setUnit('cm'));
+        findBtn.addEventListener('click', findMatch);
+
+        // ===== START =====
+        init();
+    </script>
+</body>
+</html>
