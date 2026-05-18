@@ -338,9 +338,19 @@
         .tips-list li:last-child { border-bottom: none; }
         .footer {
             text-align: center;
-            padding: 20px 16px;
+            padding: 20px 16px 32px;
             color: var(--text-muted);
             font-size: 0.78em;
+        }
+        .footer p { margin: 0; }
+        .footer p + p { margin-top: 8px; }
+        .footer .disclosure {
+            font-size: 0.85em;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+            opacity: 0.85;
         }
         @media (max-height: 720px) { .tips { display: none; } }
         @media (min-width: 600px) {
@@ -432,7 +442,8 @@
     </main>
 
     <footer class="footer">
-        ShoeFinder · based on official manufacturer charts
+        <p>WhatsMyShoeSize · based on official manufacturer charts</p>
+        <p class="disclosure">As an Amazon Associate, we earn from qualifying purchases. Links to Amazon and Zappos may generate commissions at no extra cost to you.</p>
     </footer>
 
     <script>
@@ -466,7 +477,9 @@
             // Heren + Unisex -> fashion-mens-shoes, Dames -> fashion-womens-shoes
             const category = gender === 'women' ? 'fashion-womens-shoes' : 'fashion-mens-shoes';
             const keywords = brand.toLowerCase() + ' size ' + us_size;
-            return 'https://www.amazon.com/s?k=' + encodeURIComponent(keywords) + '&i=' + category;
+            // Affiliate tag voor Amazon Associates
+            const tag = 'whatsmyshoesi-20';
+            return 'https://www.amazon.com/s?k=' + encodeURIComponent(keywords) + '&i=' + category + '&tag=' + tag;
         }
 
         function escapeHtml(s) {
