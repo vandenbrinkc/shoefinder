@@ -188,26 +188,23 @@
         .btn:hover { opacity: 0.92; }
         .btn:active { transform: scale(0.99); }
         .shop-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
             margin-top: 14px;
         }
         .btn-shop {
             display: block;
-            padding: 12px 8px;
+            width: 100%;
+            padding: 12px;
             background: var(--gradient-btn);
             color: white;
             text-decoration: none;
             border-radius: 8px;
-            font-size: 0.85em;
+            font-size: 0.9em;
             font-weight: 700;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.5px;
             box-shadow: var(--shadow-primary);
             transition: opacity 0.15s, transform 0.05s;
-            white-space: nowrap;
         }
         .btn-shop:hover { opacity: 0.92; }
         .btn-shop:active { transform: scale(0.99); }
@@ -218,8 +215,7 @@
         }
         .btn-shop:hover .arrow { transform: translateX(3px); }
         @media (min-width: 600px) {
-            .shop-row { gap: 12px; }
-            .btn-shop { padding: 14px 10px; font-size: 0.95em; letter-spacing: 0.5px; }
+            .btn-shop { padding: 14px 16px; font-size: 0.95em; letter-spacing: 0.5px; }
         }
         .result-card {
             background: var(--gradient-result);
@@ -443,7 +439,7 @@
 
     <footer class="footer">
         <p>WhatsMyShoeSize · based on official manufacturer charts</p>
-        <p class="disclosure">As an Amazon Associate, we earn from qualifying purchases. Links to Amazon and Zappos may generate commissions at no extra cost to you.</p>
+        <p class="disclosure">As an Amazon Associate, we earn from qualifying purchases. Links to Amazon may generate commissions at no extra cost to you.</p>
     </footer>
 
     <script>
@@ -462,14 +458,6 @@
 
         function genderLabel(g) {
             return ({men: "Men's Size", women: "Women's Size", unisex: "Unisex Size"})[g] || '';
-        }
-
-        function zapposSearchUrl(brand, gender, us_size) {
-            const parts = [brand.toLowerCase()];
-            if (gender === 'men') parts.push('men');
-            if (gender === 'women') parts.push('women');
-            parts.push('size', us_size);
-            return 'https://www.zappos.com/search?term=' + encodeURIComponent(parts.join(' '));
         }
 
         function amazonSearchUrl(brand, gender, us_size) {
@@ -620,8 +608,6 @@
 
         function renderResult(brand, gender, row, notes, fallbackUsed) {
             const displayLength = formatLength(row.cm, row.in, currentUnit);
-            const shopUrl = zapposSearchUrl(brand, gender, row.us);
-
             let html = '<div class="result-card">';
             html += '<div class="result-brand">' + escapeHtml(brand) + '</div>';
             html += '<div class="result-foot">for foot length ' + escapeHtml(displayLength) + '</div>';
@@ -641,7 +627,6 @@
             const amazonUrl = amazonSearchUrl(brand, gender, row.us);
             html += '<div class="shop-row">';
             html += '<a href="' + escapeHtml(amazonUrl) + '" class="btn-shop" target="_blank" rel="noopener noreferrer">Shop at Amazon <span class="arrow">→</span></a>';
-            html += '<a href="' + escapeHtml(shopUrl) + '" class="btn-shop" target="_blank" rel="noopener noreferrer">Shop at Zappos <span class="arrow">→</span></a>';
             html += '</div>';
             html += '</div>';
 
